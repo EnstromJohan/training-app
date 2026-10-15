@@ -3,10 +3,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { DEFAULT_EQUIPMENT, type Readiness } from "./engine/types";
 import { toIso } from "./engine/weekly/dates";
-import { DB_BLOCKED_EVENT, deleteBlob, exportAll, getAll, importAll, putBlob, putLocal } from "./db/local";
+import { adoptLegacyData, DB_BLOCKED_EVENT, deleteBlob, exportAll, getAll, getOne, importAll, putBlob, putLocal, selectDatabase } from "./db/local";
 import { compressPhoto } from "./photos";
 import { uuid } from "./uuid";
 import { supabase, sync } from "./db/supabase";
+import { logOut } from "./auth";
 import {
   SETTINGS_ID,
   type AiBodyEstimate,
@@ -96,6 +97,8 @@ interface Store {
   exportJson(): Promise<string>;
   importJson(json: string): Promise<number>;
   syncNow(): Promise<void>;
+  /** Waits for a running sync to finish, then logs out on this device. */
+  signOut(): Promise<void>;
 }
 
 const Ctx = createContext<Store | null>(null);
@@ -106,7 +109,11 @@ export function useStore(): Store {
   return v;
 }
 
-export function StoreProvider({ children }: { children: ReactNode }) {
+/**
+ * Holds one account's data (or the local-only data when userId is null). Mount it with
+ * key={userId} so switching account starts from a clean slate on that account's own database.
+ */
+export function StoreProvider({ userId, children }: { userId: string | null; children: ReactNode }) {
   const [s, setS] = useState<Snapshot | null>(null);
   const ref = useRef<Snapshot | null>(null);
   const [syncState, setSyncState] = useState<SyncState>(supabase() ? "idle" : "off");
@@ -171,7 +178,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       do {
         syncAgain.current = false;
         setSyncState("syncing");
-        const r = await sync();
+        if (!userId) break;
+        const r = await sync(userId);
         if ("error" in r) {
           setSyncState(r.error === "Inte inloggad" ? "signed_out" : "error");
           setSyncMessage(r.error);
@@ -187,7 +195,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     } finally {
       syncing.current = false;
     }
-  }, [load]);
+  }, [load, userId]);
 
   const scheduleSync = useCallback(() => {
     if (!supabase()) return;
@@ -196,13 +204,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [runSync]);
 
   useEffect(() => {
-    load()
-      .then(() => {
-        // Ask the browser not to evict our data (Safari otherwise may after a period of non-use).
-        navigator.storage?.persist?.().catch(() => {});
-        return runSync();
-      })
-      .catch((e) => setFatal(e instanceof Error ? e.message : String(e)));
+    const init = async () => {
+      selectDatabase(userId);
+      if (userId) await adoptLegacyData(userId);
+      // An account on a new device: fetch its history before showing anything, so onboarding
+      // doesn't flash for someone who already has data.
+      const fresh = userId && !(await getOne("settings", SETTINGS_ID));
+      if (fresh && navigator.onLine) await runSync();
+      await load();
+      // Ask the browser not to evict our data (Safari otherwise may after a period of non-use).
+      navigator.storage?.persist?.().catch(() => {});
+      if (!fresh) await runSync();
+    };
+    init().catch((e) => setFatal(e instanceof Error ? e.message : String(e)));
     const online = () => runSync();
     window.addEventListener("online", online);
     const sub = supabase()?.auth.onAuthStateChange((e) => {
@@ -211,8 +225,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return () => {
       window.removeEventListener("online", online);
       sub?.data.subscription.unsubscribe();
+      if (syncTimer.current) clearTimeout(syncTimer.current);
     };
-  }, [load, runSync]);
+  }, [load, runSync, userId]);
 
   /** Write locally first (never lost), update memory, then sync in the background. */
   const put = useCallback(
@@ -442,6 +457,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       async syncNow() {
         await runSync();
+      },
+
+      async signOut() {
+        if (syncTimer.current) clearTimeout(syncTimer.current);
+        // Let an in-flight sync finish so it can't write into the next account's database.
+        for (let i = 0; i < 100 && syncing.current; i++) await new Promise((r) => setTimeout(r, 100));
+        await logOut();
       },
     };
   }, [s, syncState, syncMessage, put, load, runSync, scheduleSync]);

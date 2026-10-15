@@ -42,7 +42,21 @@ Appen fungerar direkt utan databas. All historik sparas i webbläsarens IndexedD
 3. Kör `npx supabase db reset` för att applicera `supabase/migrations/`.
 4. Kör även `supabase/migrations/20261015000000_body_photos_mobility.sql`. Den behövs för kroppsmått, progressionsfoton (ett privat lagringsutrymme) och rörlighetsloggar. Tills den är körd sparas den datan bara på enheten, och appen visar en varning.
 5. Kör `supabase/migrations/20261016000000_body_estimates.sql` (längd, kön och AI-uppskattningar).
-6. Logga in under **Inställningar → Övrigt** med magic link.
+6. Skapa ett konto (se nedan) och logga in.
+
+### Konton
+
+Med Supabase konfigurerat visar appen en inloggningssida med användarnamn och lösenord. Inget visas och inget sparas förrän någon är inloggad.
+
+- Varje konto har en egen lokal databas på enheten (`training-app:<användar-id>`) och sina egna rader i Supabase (RLS).
+- Två konton på samma telefon ser aldrig varandras data, och synken vägrar skicka data till ett annat konto än det som äger den lokala databasen.
+- Historik som loggades innan konton fanns tas över en gång av det första konto som loggar in på enheten.
+- Den som är inloggad kan öppna appen offline. Utloggning finns under **Inställningar → Övrigt → Konto**.
+
+Det finns ingen registrering i appen ännu. Användarnamnet `namn` blir den interna adressen `namn@training-app.local` i Supabase Auth, och den adressen tar aldrig emot mejl. Skapa konton i Supabase under **Authentication → Users → Add user → Create new user**:
+- E-post: `namn@training-app.local`.
+- Lösenord: valfritt.
+- Bocka i **Auto Confirm User**.
 
 ### AI-uppskattning av kroppsfett (valfritt)
 
@@ -73,7 +87,7 @@ Projektnamnet måste vara `training-app`, samma som `name` i `wrangler.jsonc`.
 - `NEXT_PUBLIC_SUPABASE_URL` och `NEXT_PUBLIC_SUPABASE_ANON_KEY` läggs som *build variables*, eftersom de bakas in i klienten vid bygget.
 - `ANTHROPIC_API_KEY` läggs som *secret* under Variables and Secrets, eller med `npx wrangler secret put ANTHROPIC_API_KEY`.
 
-Lägg också in den nya adressen i Supabase under Authentication → URL Configuration, både som Site URL och som Redirect URL, annars fungerar inte magic link.
+Lägg också in den nya adressen i Supabase under Authentication → URL Configuration som Site URL.
 
 ## Arkitektur
 

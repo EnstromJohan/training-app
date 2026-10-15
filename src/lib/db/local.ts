@@ -10,22 +10,38 @@ function strip<T>(row: Stored<T>): T {
 /**
  * Local-first store in IndexedDB. Every write is kept on the device immediately and
  * marked dirty until the sync layer has pushed it to Supabase.
+ *
+ * Each logged-in user gets their own database ("training-app:<userId>"), so two accounts on the
+ * same device never see – or sync – each other's history. Without Supabase the app runs in
+ * local-only mode on the original "training-app" database.
  */
-const DB_NAME = "training-app";
+const LEGACY_DB = "training-app";
 const VERSION = 2;
 const BLOBS = "photo_blobs";
 const META = "meta";
 
 export type Stored<T> = T & { _dirty?: number };
 
+let dbName = LEGACY_DB;
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
 /** Fired when an open tab running an older version blocks a schema upgrade. */
 export const DB_BLOCKED_EVENT = "training-db-blocked";
 
+function upgrade(d: IDBPDatabase) {
+  for (const t of TABLES) {
+    if (!d.objectStoreNames.contains(t)) {
+      const store = d.createObjectStore(t, { keyPath: "id" });
+      store.createIndex("_dirty", "_dirty");
+    }
+  }
+  if (!d.objectStoreNames.contains(META)) d.createObjectStore(META);
+  if (!d.objectStoreNames.contains(BLOBS)) d.createObjectStore(BLOBS);
+}
+
 function db() {
   if (!dbPromise) {
-    dbPromise = openDB(DB_NAME, VERSION, {
+    dbPromise = openDB(dbName, VERSION, {
       // Another tab still has the previous version open: tell the UI instead of hanging silently.
       // The upgrade continues by itself as soon as that tab closes or reloads.
       blocked() {
@@ -40,19 +56,62 @@ function db() {
       terminated() {
         dbPromise = null;
       },
-      upgrade(d) {
-        for (const t of TABLES) {
-          if (!d.objectStoreNames.contains(t)) {
-            const store = d.createObjectStore(t, { keyPath: "id" });
-            store.createIndex("_dirty", "_dirty");
-          }
-        }
-        if (!d.objectStoreNames.contains(META)) d.createObjectStore(META);
-        if (!d.objectStoreNames.contains(BLOBS)) d.createObjectStore(BLOBS);
-      },
+      upgrade,
     });
   }
   return dbPromise;
+}
+
+/** Point all reads and writes at this user's database (null = local-only mode). */
+export function selectDatabase(userId: string | null) {
+  const name = userId ? `${LEGACY_DB}:${userId}` : LEGACY_DB;
+  if (name === dbName) return;
+  void dbPromise?.then((d) => d.close());
+  dbPromise = null;
+  dbName = name;
+}
+
+/**
+ * History logged before accounts existed lives in the shared local-only database. The first account
+ * that logs in on this device (with an empty database of its own) takes it over once: everything is
+ * copied in as unsynced, so it is uploaded to that account, and the old database is marked as claimed.
+ */
+export async function adoptLegacyData(userId: string): Promise<number> {
+  if (dbName === LEGACY_DB) return 0;
+  // Don't create the old database just to find it empty.
+  if (typeof indexedDB.databases === "function") {
+    const names = (await indexedDB.databases()).map((x) => x.name);
+    if (!names.includes(LEGACY_DB)) return 0;
+  }
+  const target = await db();
+  if ((await target.count("settings")) > 0) return 0;
+  const legacy = await openDB(LEGACY_DB, VERSION, {
+    upgrade,
+    blocking() {
+      void legacy.close();
+    },
+  });
+  try {
+    if (await legacy.get(META, "claimedBy")) return 0;
+    let n = 0;
+    for (const t of TABLES) {
+      const rows = (await legacy.getAll(t)) as BaseRecord[];
+      if (!rows.length) continue;
+      const tx = target.transaction(t, "readwrite");
+      for (const r of rows) void tx.store.put({ ...r, _dirty: 1 });
+      await tx.done;
+      n += rows.length;
+    }
+    const blobKeys = await legacy.getAllKeys(BLOBS);
+    for (const k of blobKeys) {
+      const blob = await legacy.get(BLOBS, k);
+      if (blob) await target.put(BLOBS, blob, k);
+    }
+    await legacy.put(META, userId, "claimedBy");
+    return n;
+  } finally {
+    legacy.close();
+  }
 }
 
 export async function getAll<T extends TableName>(table: T): Promise<Tables[T][]> {

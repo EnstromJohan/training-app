@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { ACHILLES_PHASES } from "@/lib/engine/rehab/achilles";
-import { supabase } from "@/lib/db/supabase";
 import { useStore, today } from "@/lib/store";
-import { LoginForm } from "./login-form";
 import { Button, Card, Scale, Stepper, cn } from "./ui";
 
 export function Onboarding() {
@@ -78,11 +76,6 @@ export function Onboarding() {
         <Stepper label="Vilopuls (morgon)" value={restingHr} onChange={setRestingHr} step={1} unit="bpm" />
         <p className="text-xs text-muted">Längd och kön används för att räkna kroppsfett från midjemått, vilopuls och ålder för uppskattade pulszoner. Utan pulsmätare styr ansträngning (RPE) och samtalstest.</p>
       </Card>
-      {supabase() && (
-        <Card>
-          <LoginForm intro="Har du redan använt appen på en annan enhet? Logga in så hämtas din historik och dina inställningar." />
-        </Card>
-      )}
     </div>,
     <div key="1" className="space-y-4">
       <h1 className="text-[32px] font-bold leading-none tracking-tight">Hälsenan</h1>

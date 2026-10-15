@@ -10,9 +10,9 @@ import { weekStart } from "@/lib/engine/weekly/dates";
 import type { CardioSlot, EquipmentProfile } from "@/lib/engine/types";
 import type { SettingsRec } from "@/lib/db/records";
 import { supabase } from "@/lib/db/supabase";
-import { LoginForm } from "@/components/login-form";
 import { EXERCISES } from "@/lib/program/exercises";
 import { useStore, today } from "@/lib/store";
+import { useUser } from "@/lib/auth";
 
 type Tab = "goals" | "equipment" | "injuries" | "other";
 
@@ -376,6 +376,8 @@ function DataSettings() {
   const file = useRef<HTMLInputElement>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const sb = supabase();
+  const user = useUser();
+  const [signingOut, setSigningOut] = useState(false);
   const counts = {
     pass: store.s.sessions.filter((x) => x.status === "completed" && !x.deletedAt).length,
     set: store.s.sets.filter((x) => !x.deletedAt).length,
@@ -394,6 +396,28 @@ function DataSettings() {
 
   return (
     <>
+      {user && (
+        <>
+          <SectionTitle>Konto</SectionTitle>
+          <Card className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="text-[12px] text-muted">Inloggad som</div>
+              <div className="truncate text-[16px] font-semibold">{user.username}</div>
+            </div>
+            <Button
+              size="sm"
+              variant="soft"
+              disabled={signingOut}
+              onClick={async () => {
+                setSigningOut(true);
+                await store.signOut();
+              }}
+            >
+              {signingOut ? "Loggar ut…" : "Logga ut"}
+            </Button>
+          </Card>
+        </>
+      )}
       <Card className="tabular grid grid-cols-3 text-center">
         <div><div className="text-xl font-semibold">{counts.pass}</div><div className="text-[11px] text-muted">pass</div></div>
         <div><div className="text-xl font-semibold">{counts.set}</div><div className="text-[11px] text-muted">set</div></div>
@@ -409,8 +433,11 @@ function DataSettings() {
         ) : (
           <>
             <p>Status: <b>{{ off: "Av", idle: "Synkad", syncing: "Synkar…", error: "Fel", signed_out: "Inte inloggad" }[store.syncState]}</b>{store.syncMessage && ` – ${store.syncMessage}`}</p>
-            {store.syncState === "signed_out" && <LoginForm />}
-            <Button size="sm" variant="soft" onClick={() => store.syncNow()}>Synka nu</Button>
+            {store.syncState === "signed_out" ? (
+              <Button size="sm" onClick={() => store.signOut()}>Logga in igen</Button>
+            ) : (
+              <Button size="sm" variant="soft" onClick={() => store.syncNow()}>Synka nu</Button>
+            )}
           </>
         )}
         {msg && <p className="text-xs text-muted">{msg}</p>}

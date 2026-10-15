@@ -38,12 +38,14 @@ const isMissingTable = (e: { code?: string; message?: string }) =>
  * Push local dirty records (idempotent upsert by id), then pull anything newer from
  * other devices. Last write (updatedAt) wins; nothing is ever hard-deleted.
  */
-export async function sync(): Promise<SyncResult> {
+export async function sync(expectedUserId: string): Promise<SyncResult> {
   const sb = supabase();
   if (!sb) return { error: "Supabase är inte konfigurerat" };
   const { data: auth } = await sb.auth.getUser();
   const userId = auth.user?.id;
   if (!userId) return { error: "Inte inloggad" };
+  // The local database belongs to one account: never push it into another one.
+  if (userId !== expectedUserId) return { error: "Inloggad som en annan användare" };
 
   let pushed = 0;
   let pulled = 0;
