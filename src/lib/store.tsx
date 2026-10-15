@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { DEFAULT_EQUIPMENT, type Readiness } from "./engine/types";
 import { toIso } from "./engine/weekly/dates";
-import { deleteBlob, exportAll, getAll, importAll, putBlob, putLocal } from "./db/local";
+import { DB_BLOCKED_EVENT, deleteBlob, exportAll, getAll, importAll, putBlob, putLocal } from "./db/local";
 import { compressPhoto } from "./photos";
 import { supabase, sync } from "./db/supabase";
 import {
@@ -113,6 +113,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const syncAgain = useRef(false);
   const [fatal, setFatal] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [blocked, setBlocked] = useState(false);
+
+  useEffect(() => {
+    const onBlocked = () => setBlocked(true);
+    window.addEventListener(DB_BLOCKED_EVENT, onBlocked);
+    return () => window.removeEventListener(DB_BLOCKED_EVENT, onBlocked);
+  }, []);
 
   useEffect(() => {
     if (!toast) return;
@@ -442,6 +449,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         <button onClick={() => location.reload()} className="bg-accent-grad mt-2 h-11 rounded-full px-6 text-[14px] font-semibold text-on-accent">
           Försök igen
         </button>
+      </div>
+    );
+  }
+  if (!store && blocked) {
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-3 px-6 text-center">
+        <h1 className="text-[20px] font-semibold">Appen är öppen i en annan flik</h1>
+        <p className="text-[14px] text-ink-2">
+          En äldre version körs i en annan flik eller ett annat fönster. Stäng den (eller ladda om den) – då uppdateras din data och appen startar här automatiskt. Ingen data går förlorad.
+        </p>
       </div>
     );
   }

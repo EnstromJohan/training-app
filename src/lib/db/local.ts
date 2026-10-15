@@ -20,9 +20,26 @@ export type Stored<T> = T & { _dirty?: number };
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
+/** Fired when an open tab running an older version blocks a schema upgrade. */
+export const DB_BLOCKED_EVENT = "training-db-blocked";
+
 function db() {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, VERSION, {
+      // Another tab still has the previous version open: tell the UI instead of hanging silently.
+      // The upgrade continues by itself as soon as that tab closes or reloads.
+      blocked() {
+        window.dispatchEvent(new Event(DB_BLOCKED_EVENT));
+      },
+      // This tab is the old one: let the newer version upgrade, then reload into the new code.
+      blocking() {
+        void dbPromise?.then((d) => d.close());
+        dbPromise = null;
+        window.location.reload();
+      },
+      terminated() {
+        dbPromise = null;
+      },
       upgrade(d) {
         for (const t of TABLES) {
           if (!d.objectStoreNames.contains(t)) {
