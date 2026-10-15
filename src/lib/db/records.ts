@@ -97,6 +97,11 @@ export interface SettingsRec extends BaseRecord {
   name: string;
   birthYear: number | null;
   bodyWeightKg: number | null;
+  /** For body-fat formulas (RFM). */
+  heightCm?: number | null;
+  sex?: "male" | "female" | null;
+  /** User opted in to sending progress photos to the AI estimate. */
+  aiPhotoConsent?: boolean;
   restingHr: number | null;
   maxHr: number | null;
   experience: "beginner" | "intermediate" | "advanced";
@@ -128,6 +133,19 @@ export interface BodyMeasurementRec extends BaseRecord {
 export type PhotoPose = "front" | "side" | "back";
 
 /** Progress photo metadata. The image itself lives in IndexedDB (photo_blobs) and Supabase Storage. */
+/** AI estimate of body fat from a progress photo (a range – never a precise measurement). */
+export interface AiBodyEstimate {
+  assessable: boolean;
+  bodyFatLow: number | null;
+  bodyFatHigh: number | null;
+  bodyFatMid: number | null;
+  confidence: "low" | "medium" | "high";
+  cues: string[];
+  limitations: string;
+  model: string;
+  at: string;
+}
+
 export interface ProgressPhotoRec extends BaseRecord {
   date: string;
   pose: PhotoPose;
@@ -135,6 +153,7 @@ export interface ProgressPhotoRec extends BaseRecord {
   height: number;
   /** Path in the private `progress-photos` bucket once uploaded. */
   storagePath: string | null;
+  aiEstimate?: AiBodyEstimate | null;
 }
 
 export interface MobilityLogRec extends BaseRecord {

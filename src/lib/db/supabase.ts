@@ -48,6 +48,7 @@ export async function sync(): Promise<SyncResult> {
   let pushed = 0;
   let pulled = 0;
   const missing = new Set<string>();
+  const missingColumns = new Set<string>();
 
   // First sync on this device: settings already in the cloud win over a fresh local onboarding,
   // so logging in on a new phone never overwrites rehab phase, swaps or deload weeks.
@@ -68,13 +69,14 @@ export async function sync(): Promise<SyncResult> {
   for (const t of TABLES) {
     const dirty = await getDirty(t);
     if (dirty.length) {
-      const { error } = await sb.from(t).upsert(dirty.map((r) => toRow(r, userId)), { onConflict: "user_id,id" });
+      const { error, dropped } = await upsertTolerant(sb, t, dirty.map((r) => toRow(r, userId)), missingColumns);
       if (error && isMissingTable(error)) {
         missing.add(t); // stays dirty locally and is pushed once the migration has been run
         continue;
       }
       if (error) return { error: `${t}: ${error.message}` };
-      await markClean(t, dirty);
+      // Records sent without some columns stay dirty, so they go up in full once the migration has run.
+      if (!dropped) await markClean(t, dirty);
       pushed += dirty.length;
     }
   }
@@ -98,9 +100,10 @@ export async function sync(): Promise<SyncResult> {
     await setMeta(key, max);
   }
   if (firstSync) await setMeta(firstKey, true);
-  const warning = missing.size
-    ? `Databasen saknar ${[...missing].join(", ")} – kör den senaste migrationen i Supabase. Datan ligger kvar på enheten.`
-    : undefined;
+  const warning =
+    missing.size || missingColumns.size
+      ? `Databasen saknar ${[...missing, ...missingColumns].join(", ")} – kör den senaste migrationen i Supabase. Datan ligger kvar på enheten.`
+      : undefined;
   return { pushed, pulled, warning };
 }
 
@@ -110,6 +113,29 @@ async function mergeRemote(table: TableName, rec: BaseRecord) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await putLocal(table, rec as any, false);
   }
+}
+
+/**
+ * Upsert that survives a newer client talking to an older schema: a column the database doesn't
+ * have yet (migration not run) is dropped from the rows and the upsert retried, so the rest still
+ * syncs. The value stays in the local record and is pushed in full once the migration has run.
+ */
+export async function upsertTolerant(sb: SupabaseClient, table: string, rows: Record<string, unknown>[], missingColumns: Set<string>) {
+  let current = rows;
+  let dropped = false;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const { error } = await sb.from(table).upsert(current, { onConflict: "user_id,id" });
+    const col = error && error.code === "PGRST204" ? /'([^']+)' column/.exec(error.message)?.[1] : undefined;
+    if (!col || !current.some((r) => col in r)) return { error, dropped };
+    missingColumns.add(`${table}.${col}`);
+    current = current.map((r) => {
+      const copy = { ...r };
+      delete copy[col];
+      return copy;
+    });
+    dropped = true;
+  }
+  return { error: { message: `${table}: för många saknade kolumner`, code: "client" }, dropped };
 }
 
 export const PHOTO_BUCKET = "progress-photos";

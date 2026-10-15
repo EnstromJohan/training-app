@@ -14,6 +14,8 @@ export function Onboarding() {
   const [birthYear, setBirthYear] = useState<number>(s.settings.birthYear ?? 1990);
   const [bodyWeight, setBodyWeight] = useState<number>(s.settings.bodyWeightKg ?? 80);
   const [restingHr, setRestingHr] = useState<number>(s.settings.restingHr ?? 60);
+  const [heightCm, setHeightCm] = useState<number>(s.settings.heightCm ?? 180);
+  const [sex, setSex] = useState<"male" | "female" | null>(s.settings.sex ?? null);
   const [phase, setPhase] = useState(s.settings.rehab.phase);
   const [baseline, setBaseline] = useState(s.settings.rehab.baselineMorningPain);
   const [eq, setEq] = useState(s.settings.equipment);
@@ -24,6 +26,8 @@ export function Onboarding() {
       name: name.trim(),
       birthYear,
       bodyWeightKg: bodyWeight,
+      heightCm,
+      sex,
       restingHr,
       equipment: eq,
       rehab: {
@@ -53,8 +57,26 @@ export function Onboarding() {
         </label>
         <Stepper label="Födelseår" value={birthYear} onChange={setBirthYear} step={1} />
         <Stepper label="Kroppsvikt" value={bodyWeight} onChange={setBodyWeight} step={0.5} unit="kg" />
+        <Stepper label="Längd" value={heightCm} onChange={(v) => setHeightCm(Math.min(230, Math.max(120, v)))} step={1} unit="cm" />
+        <div className="flex gap-1.5">
+          {(
+            [
+              ["male", "Man"],
+              ["female", "Kvinna"],
+            ] as const
+          ).map(([v, l]) => (
+            <button
+              key={v}
+              aria-pressed={sex === v}
+              onClick={() => setSex(v)}
+              className={cn("h-10 flex-1 rounded-full text-[13px] font-medium", sex === v ? "bg-accent-grad text-on-accent" : "border border-line bg-card-2 text-ink-2")}
+            >
+              {l}
+            </button>
+          ))}
+        </div>
         <Stepper label="Vilopuls (morgon)" value={restingHr} onChange={setRestingHr} step={1} unit="bpm" />
-        <p className="text-xs text-muted">Vilopuls och ålder används bara för uppskattade pulszoner. Utan pulsmätare styr ansträngning (RPE) och samtalstest.</p>
+        <p className="text-xs text-muted">Längd och kön används för att räkna kroppsfett från midjemått, vilopuls och ålder för uppskattade pulszoner. Utan pulsmätare styr ansträngning (RPE) och samtalstest.</p>
       </Card>
       {supabase() && (
         <Card>

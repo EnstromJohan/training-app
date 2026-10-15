@@ -5,9 +5,11 @@ import { DEFAULT_EQUIPMENT, type Readiness } from "./engine/types";
 import { toIso } from "./engine/weekly/dates";
 import { DB_BLOCKED_EVENT, deleteBlob, exportAll, getAll, importAll, putBlob, putLocal } from "./db/local";
 import { compressPhoto } from "./photos";
+import { uuid } from "./uuid";
 import { supabase, sync } from "./db/supabase";
 import {
   SETTINGS_ID,
+  type AiBodyEstimate,
   type BaseRecord,
   type BodyMeasurementRec,
   type CalibrationRec,
@@ -28,7 +30,7 @@ import { EXERCISES } from "./program/exercises";
 import { PROGRAM_BY_ID } from "./program/program";
 
 const now = () => new Date().toISOString();
-const uuid = () => crypto.randomUUID();
+
 export const today = () => toIso(new Date());
 
 function defaultSettings(): SettingsRec {
@@ -89,6 +91,7 @@ interface Store {
   deleteBody(id: string): Promise<void>;
   addPhoto(file: File, pose: PhotoPose, date: string): Promise<void>;
   deletePhoto(id: string): Promise<void>;
+  setPhotoEstimate(id: string, estimate: AiBodyEstimate | null): Promise<void>;
   logMobility(kind: MobilityLogRec["kind"], itemIds: string[]): Promise<void>;
   exportJson(): Promise<string>;
   importJson(json: string): Promise<number>;
@@ -413,6 +416,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (!rec) return;
         await deleteBlob(id).catch(() => {});
         await put("progress_photos", { ...rec, deletedAt: now(), updatedAt: now() });
+      },
+
+      async setPhotoEstimate(id, estimate) {
+        const rec = cur().photos.find((x) => x.id === id);
+        if (rec) await put("progress_photos", { ...rec, aiEstimate: estimate, updatedAt: now() });
       },
 
       async logMobility(kind, itemIds) {

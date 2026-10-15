@@ -41,7 +41,14 @@ Appen fungerar direkt utan databas. All historik sparas i webbläsarens IndexedD
 2. Kopiera `API URL` och `anon key` till `.env.local` (se `.env.example`).
 3. Kör `npx supabase db reset` för att applicera `supabase/migrations/`.
 4. Kör även `supabase/migrations/20261015000000_body_photos_mobility.sql`. Den behövs för kroppsmått, progressionsfoton (ett privat lagringsutrymme) och rörlighetsloggar. Tills den är körd sparas den datan bara på enheten, och appen visar en varning.
-5. Logga in under **Inställningar → Data** med magic link. Lokala data pushas automatiskt, och synken körs i bakgrunden efter varje ändring och när nätet kommer tillbaka.
+5. Kör `supabase/migrations/20261016000000_body_estimates.sql` (längd, kön och AI-uppskattningar).
+6. Logga in under **Inställningar → Övrigt** med magic link.
+
+### AI-uppskattning av kroppsfett (valfritt)
+
+Lägg `ANTHROPIC_API_KEY` i `.env.local`, eller som miljövariabel på servern vid deploy. Nyckeln används bara i server-routen `/api/body-estimate` och når aldrig webbläsaren.
+
+Routen kräver att du är inloggad, begränsar till 20 analyser per dag och sparar inte bilden. Fotot skalas ner till 1024 px utan metadata innan det skickas, och bara efter att du gett samtycke i appen. Modellen är Claude Opus 5.5 med strukturerat svar. Resultatet är ett intervall som sparas på fotot. Lokala data pushas automatiskt, och synken körs i bakgrunden efter varje ändring och när nätet kommer tillbaka.
 
 Tabellerna har RLS per användare och ingen delete-policy. Historik kan alltså inte hårdraderas från klienten. Under Inställningar → Data finns också JSON-export och JSON-import.
 
@@ -69,6 +76,7 @@ Motorerna är rena funktioner med tydliga regler. Varje rekommendation har en re
   - Muskelgrupper: volym mot veckomål, utveckling och symmetri.
   - Insikter: styrka, kondition, återhämtning, sömn, belastning (ACWR) och uppskattad skaderisk.
   - Kropp: vikt, kroppsfett, muskelmassa, mått, progressionsfoton och komposition.
+- **Kroppsfett från tre källor:** smart våg, midjemått (RFM: 64/76 − 20 × längd/midja) och AI-uppskattning från foto (intervall). De visas var för sig så att trenden kan följas inom samma metod.
 - **Rehab & Prehab:** hälsenans belastningstrappa samt förebyggande övningar och rörlighet. Rörlighet räknas mot veckomålet.
 
 Bilderna graderas automatiskt till mörkt tema i `npm run images` (se `grades` i `src/lib/images/slots.json`).

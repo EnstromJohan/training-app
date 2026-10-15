@@ -214,9 +214,50 @@ export default function SettingsPage() {
               <input defaultValue={st.name} onBlur={(e) => set({ name: e.target.value.trim() })} className="block w-full bg-transparent text-[16px] font-medium outline-none" />
             </label>
             <Stepper label="Födelseår" value={st.birthYear ?? 1990} onChange={(v) => set({ birthYear: v })} step={1} />
+            {st.heightCm ? (
+              <Stepper label="Längd" value={st.heightCm} onChange={(v) => set({ heightCm: Math.min(230, Math.max(120, v)) })} step={1} unit="cm" />
+            ) : (
+              <button onClick={() => set({ heightCm: 180 })} className="flex h-12 w-full items-center justify-between rounded-[14px] border border-dashed border-line px-4 text-[13px] text-ink-2">
+                Lägg till längd (för kroppsfett från midjemått) <span className="text-accent">+</span>
+              </button>
+            )}
+            <div className="rounded-[14px] border border-line bg-card-2 px-3 py-2">
+              <div className="mb-1.5 text-[9px] text-muted">Kön (används bara i kroppsfettformler)</div>
+              <div className="flex gap-1.5">
+                {(
+                  [
+                    ["male", "Man"],
+                    ["female", "Kvinna"],
+                  ] as const
+                ).map(([v, l]) => (
+                  <button
+                    key={v}
+                    aria-pressed={st.sex === v}
+                    onClick={() => set({ sex: v })}
+                    className={cn("h-9 flex-1 rounded-full text-[13px] font-medium", st.sex === v ? "bg-accent-grad text-on-accent" : "border border-line bg-card text-ink-2")}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
             <Stepper label="Vilopuls" value={st.restingHr ?? 60} onChange={(v) => set({ restingHr: v })} step={1} unit="bpm" />
             <Stepper label="Maxpuls (0 = okänd)" value={st.maxHr ?? 0} onChange={(v) => set({ maxHr: v || null })} step={1} unit="bpm" />
             <p className="px-2 pb-1 text-[11px] text-muted">Kroppsvikt loggas under Analys → Kropp.</p>
+          </Card>
+          <SectionTitle>AI-analys av foton</SectionTitle>
+          <Card className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-[13px] font-medium">Tillåt AI-uppskattning av kroppsfett</div>
+              <div className="text-[11px] text-muted">När du väljer det skickas ett foto i taget till Anthropics API. Stäng av för att återkalla samtycket.</div>
+            </div>
+            <input
+              type="checkbox"
+              checked={!!st.aiPhotoConsent}
+              onChange={(e) => set({ aiPhotoConsent: e.target.checked })}
+              className="size-5 accent-[#ff8a3d]"
+              aria-label="Tillåt AI-uppskattning av kroppsfett"
+            />
           </Card>
           <ProgressionSettings />
           <DataSettings />

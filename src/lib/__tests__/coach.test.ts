@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { cardioProjection, exposuresByExercise, prescribeDay, weekPlan, type Snapshot } from "../coach";
-import { fromRow, toRow } from "../db/supabase";
+import { fromRow, toRow, upsertTolerant } from "../db/supabase";
 import { SETTINGS_ID, type SettingsRec, type SetLogRec } from "../db/records";
 import { DEFAULT_EQUIPMENT } from "../engine/types";
 import { ACHILLES_PHASES } from "../engine/rehab/achilles";
@@ -94,12 +94,24 @@ describe("sync mapping", () => {
     expect(fromRow(row)).toEqual(settings);
   });
 
-  it("matches the migration's columns", () => {
-    const sql = fs.readFileSync(path.join(process.cwd(), "supabase/migrations/20261014000000_training_schema.sql"), "utf8");
+  it("matches the migrations' columns", () => {
+    // All migrations together: create table + later "add column".
+    const dir = path.join(process.cwd(), "supabase/migrations");
+    const sql = fs.readdirSync(dir).sort().map((f) => fs.readFileSync(path.join(dir, f), "utf8")).join("\n");
     const columns = (table: string) => {
       const body = sql.split(`create table public.${table} (`)[1].split(");")[0];
-      return new Set(body.split("\n").map((l) => l.trim().split(/\s+/)[0]).filter((c) => c && c !== "primary"));
+      const cols = new Set(body.split("\n").map((l) => l.trim().split(/\s+/)[0]).filter((c) => c && c !== "primary"));
+      for (const m of sql.matchAll(new RegExp(`alter table public\\.${table} add column if not exists (\\w+)`, "g"))) cols.add(m[1]);
+      return cols;
     };
+    const fullSettings = { ...settings, heightCm: 180, sex: "male" as const, aiPhotoConsent: false };
+    for (const key of Object.keys(toRow(fullSettings, "u"))) expect(columns("settings")).toContain(key);
+    const photo = { id: "p", createdAt: T, updatedAt: T, deletedAt: null, date: "2026-10-05", pose: "front", width: 1, height: 1, storagePath: null, aiEstimate: null };
+    for (const key of Object.keys(toRow(photo, "u"))) expect(columns("progress_photos")).toContain(key);
+    const body = { id: "b", createdAt: T, updatedAt: T, deletedAt: null, date: "2026-10-05", weightKg: 80, bodyFatPct: null, muscleMassKg: null, waistCm: null, chestCm: null, armCm: null, thighCm: null, hipsCm: null, notes: null };
+    for (const key of Object.keys(toRow(body, "u"))) expect(columns("body_measurements")).toContain(key);
+    const mob = { id: "m", createdAt: T, updatedAt: T, deletedAt: null, date: "2026-10-05", kind: "mobility", itemIds: [], completed: true };
+    for (const key of Object.keys(toRow(mob, "u"))) expect(columns("mobility_logs")).toContain(key);
     for (const key of Object.keys(toRow(settings, "u"))) expect(columns("settings")).toContain(key);
     const s = empty();
     addSession(s, "a", "2026-10-05", "2026-10-05T08:00:00Z", "bench-press", 80, [8]);
@@ -137,5 +149,35 @@ describe("image slots", () => {
   it("covers every schedule category", () => {
     const cats = new Set(PROGRAM.map((d) => d.category).filter((c) => c !== "rest"));
     for (const c of cats) expect(config.slots.some((s: { key: string }) => s.key === `schedule/${c}`)).toBe(true);
+  });
+});
+
+describe("sync against an older schema", () => {
+  it("drops a column the database lacks, retries, and reports it", async () => {
+    const calls: Array<Record<string, unknown>[]> = [];
+    const sb = {
+      from: () => ({
+        upsert: async (rows: Record<string, unknown>[]) => {
+          calls.push(rows);
+          return "ai_estimate" in rows[0]
+            ? { error: { code: "PGRST204", message: "Could not find the 'ai_estimate' column of 'progress_photos' in the schema cache" } }
+            : { error: null };
+        },
+      }),
+    };
+    const missing = new Set<string>();
+    const res = await upsertTolerant(sb as never, "progress_photos", [{ id: "1", ai_estimate: { x: 1 }, date: "2026-10-05" }], missing);
+    expect(res.error).toBeNull();
+    expect(res.dropped).toBe(true); // caller keeps the record dirty
+    expect(calls).toHaveLength(2);
+    expect(calls[1][0]).not.toHaveProperty("ai_estimate");
+    expect(missing).toContain("progress_photos.ai_estimate");
+  });
+
+  it("does not loop on unrelated errors", async () => {
+    const sb = { from: () => ({ upsert: async () => ({ error: { code: "42501", message: "permission denied" } }) }) };
+    const res = await upsertTolerant(sb as never, "settings", [{ id: "1" }], new Set());
+    expect(res.error?.code).toBe("42501");
+    expect(res.dropped).toBe(false);
   });
 });
