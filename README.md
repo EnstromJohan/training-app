@@ -52,6 +52,29 @@ Routen kräver att du är inloggad, begränsar till 20 analyser per dag och spar
 
 Tabellerna har RLS per användare och ingen delete-policy. Historik kan alltså inte hårdraderas från klienten. Under Inställningar → Data finns också JSON-export och JSON-import.
 
+## Deploy (Cloudflare Workers)
+
+Appen körs på Cloudflare Workers via [OpenNext](https://opennext.js.org/cloudflare). Konfigurationen finns i `wrangler.jsonc` och `open-next.config.ts`.
+
+- `npm run preview` bygger appen och kör den lokalt i Workers-miljön på http://localhost:8787.
+- `npm run deploy` bygger och deployar. Kör `npx wrangler login` första gången.
+
+Vid Git-kopplad deploy (Workers & Pages → Create → Import a repository):
+
+| Fält | Värde |
+|---|---|
+| Build command | `npx opennextjs-cloudflare build` |
+| Deploy command | `npx opennextjs-cloudflare deploy` |
+| Non-production branch deploy command | `npx opennextjs-cloudflare upload` |
+
+Projektnamnet måste vara `training-app`, samma som `name` i `wrangler.jsonc`.
+
+**Variabler:**
+- `NEXT_PUBLIC_SUPABASE_URL` och `NEXT_PUBLIC_SUPABASE_ANON_KEY` läggs som *build variables*, eftersom de bakas in i klienten vid bygget.
+- `ANTHROPIC_API_KEY` läggs som *secret* under Variables and Secrets, eller med `npx wrangler secret put ANTHROPIC_API_KEY`.
+
+Lägg också in den nya adressen i Supabase under Authentication → URL Configuration, både som Site URL och som Redirect URL, annars fungerar inte magic link.
+
 ## Arkitektur
 
 | Del | Plats |
