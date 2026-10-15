@@ -1,31 +1,34 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: light;
-  --bg: #f2efea;
-  --card: #faf8f5;
-  --card-2: #ece8e2;
-  --ink: #141312;
-  --ink-2: #3b3936;
-  --muted: #8f8a84;
-  --line: #e4dfd8;
-  --accent: #f5a877;
-  --accent-ink: #b85a28;
-  --accent-soft: #fbe2cf;
-  --good: #43a96d;
-  --good-soft: #d5eedc;
-  --good-ink: #1f6b3e;
-  --muscle: #d6cfc6;
-  --muscle-dark: #45403b;
-  --warn: #d98a2b;
-  --bad: #d65a4a;
-  --bad-soft: #f8e0dc;
-  --hero: #171615;
-  --z1: #b9d7f0;
-  --z2: #5cb87a;
-  --z3: #f2c14e;
-  --z4: #f39a64;
-  --z5: #e8676b;
+  color-scheme: dark;
+  --bg: #090909;
+  --card: #141414;
+  --card-2: #1e1e1e;
+  --ink: #f4f3f1;
+  --ink-2: #c9c5c0;
+  --muted: #8a8580;
+  --line: #262626;
+  --accent: #ff8a3d;
+  --accent-2: #f2681c;
+  --accent-ink: #ffa566;
+  --accent-soft: #2a170b;
+  --on-accent: #170c05;
+  --good: #4ade80;
+  --good-soft: #10241a;
+  --good-ink: #74e7a2;
+  --mint: #1e1e1e;
+  --muscle: #2c2a28;
+  --muscle-dark: #2c2a28;
+  --warn: #fbbf24;
+  --bad: #f87171;
+  --bad-soft: #2a1313;
+  --hero: #090909;
+  --z1: #5eb5c9;
+  --z2: #4ade80;
+  --z3: #fcd34d;
+  --z4: #fb923c;
+  --z5: #f87171;
 }
 
 @theme inline {
@@ -39,15 +42,17 @@
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-2: var(--accent-2);
+  --color-on-accent: var(--on-accent);
   --color-good: var(--good);
   --color-good-soft: var(--good-soft);
   --color-good-ink: var(--good-ink);
+  --color-mint: var(--mint);
   --color-warn: var(--warn);
   --color-bad: var(--bad);
   --color-bad-soft: var(--bad-soft);
   --color-hero: var(--hero);
   --font-sans: var(--font-inter);
-  --font-serif: var(--font-serif-display);
 }
 
 html,
@@ -95,9 +100,9 @@ input[type="number"] {
 .level-slider {
   -webkit-appearance: none;
   appearance: none;
-  height: 4px;
+  height: 6px;
   border-radius: 999px;
-  background: var(--card-2);
+  background: linear-gradient(to right, #7a3a12 0%, var(--accent) var(--p, 50%), var(--card-2) var(--p, 50%));
 }
 .level-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -105,8 +110,8 @@ input[type="number"] {
   height: 18px;
   border-radius: 999px;
   background: var(--accent);
-  border: 3px solid var(--card);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 12px rgba(255, 138, 61, 0.7);
 }
 .level-slider::-moz-range-thumb {
   width: 18px;
@@ -148,4 +153,25 @@ a {
    context / containing block that would trap fixed sheets under the bottom nav. */
 .animate-page {
   animation: page-in 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Dark-theme surfaces & glow (design: orange accent with soft light).
+   In the components layer so Tailwind utilities (bg-*, border-*) can override per use. */
+@layer components {
+  .bg-accent-grad {
+    background: linear-gradient(180deg, #ff9a4f 0%, var(--accent) 45%, var(--accent-2) 100%);
+  }
+  .glow {
+    box-shadow: 0 10px 30px -8px rgba(255, 128, 50, 0.6), 0 0 0 1px rgba(255, 160, 100, 0.25) inset;
+  }
+  .glow-soft {
+    box-shadow: 0 0 22px -4px rgba(255, 128, 50, 0.45);
+  }
+  .text-glow {
+    text-shadow: 0 0 18px rgba(255, 138, 61, 0.55);
+  }
+  .surface {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)), var(--card);
+    border: 1px solid var(--line);
+  }
 }

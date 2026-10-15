@@ -37,7 +37,7 @@ export function Onboarding() {
 
   const steps = [
     <div key="0" className="space-y-4">
-      <h1 className="font-serif text-5xl leading-[0.95]">Din personliga tränare</h1>
+      <h1 className="text-[40px] font-bold leading-[1.02] tracking-tight">Din personliga tränare</h1>
       <p className="text-ink-2">
         Appen planerar varje pass, fyller i vikter, reps och cardio – och justerar nästa pass efter vad du faktiskt presterade.
       </p>
@@ -48,7 +48,7 @@ export function Onboarding() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Johan"
-            className="mt-1 h-12 w-full rounded-2xl bg-card-2/70 px-4 text-lg outline-none"
+            className="mt-1 h-12 w-full rounded-2xl border border-line bg-card-2 px-4 text-lg outline-none"
           />
         </label>
         <Stepper label="Födelseår" value={birthYear} onChange={setBirthYear} step={1} />
@@ -63,19 +63,19 @@ export function Onboarding() {
       )}
     </div>,
     <div key="1" className="space-y-4">
-      <h1 className="font-serif text-4xl leading-none">Hälsenan</h1>
+      <h1 className="text-[32px] font-bold leading-none tracking-tight">Hälsenan</h1>
       <p className="text-ink-2">Välj fasen din fysio har godkänt. Löpning, hopp och övningar med hög hälsenebelastning spärras tills du har klartecken.</p>
       <div className="space-y-2">
         {ACHILLES_PHASES.map((p) => (
           <button
             key={p.phase}
             onClick={() => setPhase(p.phase)}
-            className={cn("w-full rounded-2xl p-4 text-left transition", phase === p.phase ? "bg-ink text-white" : "bg-card")}
+            className={cn("w-full rounded-2xl p-4 text-left transition", phase === p.phase ? "glow-soft border border-accent bg-accent-soft" : "surface")}
           >
             <div className="text-sm font-semibold">
               Fas {p.phase} · {p.name}
             </div>
-            <div className={cn("text-xs", phase === p.phase ? "text-white/70" : "text-muted")}>
+            <div className={cn("text-xs", "text-muted")}>
               {p.goal}
               {p.requiresClearance ? " · kräver klartecken" : ""}
             </div>
@@ -88,7 +88,7 @@ export function Onboarding() {
       </Card>
     </div>,
     <div key="2" className="space-y-4">
-      <h1 className="font-serif text-4xl leading-none">Utrustning</h1>
+      <h1 className="text-[32px] font-bold leading-none tracking-tight">Utrustning</h1>
       <p className="text-ink-2">Vikter rundas alltid nedåt till steg som finns på ditt gym.</p>
       <Card className="space-y-2">
         <Stepper label="Skivstång" value={eq.barbellKg} onChange={(v) => setEq({ ...eq, barbellKg: v })} step={2.5} unit="kg" />
@@ -100,7 +100,7 @@ export function Onboarding() {
       </Card>
     </div>,
     <div key="3" className="space-y-4">
-      <h1 className="font-serif text-4xl leading-none">Så fungerar det</h1>
+      <h1 className="text-[32px] font-bold leading-none tracking-tight">Så fungerar det</h1>
       <Card className="space-y-3 text-[15px] text-ink-2">
         <p>
           <b className="text-ink">Kalibrering.</b> Första gången du gör en övning anger du en nylig prestation (t.ex. 80 kg × 8 med 2 reps kvar) eller väljer en startvikt. Appen hittar aldrig på vikter.
@@ -122,7 +122,7 @@ export function Onboarding() {
     <div className="mx-auto flex min-h-dvh max-w-md flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))]">
       <div className="mb-6 flex gap-1.5">
         {steps.map((_, i) => (
-          <div key={i} className={cn("h-1 flex-1 rounded-full", i <= step ? "bg-ink" : "bg-line")} />
+          <div key={i} className={cn("h-1 flex-1 rounded-full", i <= step ? "bg-accent" : "bg-line")} />
         ))}
       </div>
       <div className="flex-1">{steps[step]}</div>

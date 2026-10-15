@@ -64,10 +64,14 @@ export function RestTimer({ timer, restSec, onChange }: { timer: TimerState | nu
   };
 
   return (
-    <Ring progress={timer ? left / timer.total : 0} size={104} stroke={6} color={timer && left === 0 ? "var(--good)" : "#6b8fb5"} track="var(--card-2)">
-      <span className="text-[10px] text-muted">{timer && left === 0 ? "Kör!" : "Vila"}</span>
-      <span className="tabular text-[22px] font-semibold leading-tight">{mmss(left)}</span>
-      <button aria-label={running ? "Pausa vila" : "Starta vila"} onClick={toggle} className="mt-1 flex size-6 items-center justify-center rounded-full bg-ink text-white">
+    <Ring progress={timer ? left / timer.total : 0} size={100} stroke={6} color={timer && left === 0 ? "var(--good)" : "var(--accent)"} track="var(--card-2)" glow={!!timer}>
+      <span className="text-[11px] text-ink-2">{timer && left === 0 ? "Kör!" : "Vila"}</span>
+      <span className="tabular text-[24px] font-bold leading-tight">{mmss(left)}</span>
+      <button
+        aria-label={running ? "Pausa vila" : "Starta vila"}
+        onClick={toggle}
+        className="bg-accent-grad mt-0.5 flex size-6 items-center justify-center rounded-full text-on-accent"
+      >
         {running ? <Pause size={11} fill="currentColor" /> : <Play size={11} fill="currentColor" />}
       </button>
     </Ring>

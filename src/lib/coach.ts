@@ -7,6 +7,9 @@ import { achillesAllowed, planRehab, type RehabPlan } from "./engine/rehab/achil
 import { shouldDeload } from "./engine/strength/deload";
 import { isLowReadiness, prescribeStrength, readinessScore } from "./engine/strength/progression";
 import { addDays, daysBetween, weekStart } from "./engine/weekly/dates";
+import { acwr, estimateMinutes, injuryRisk, loadStatus, type DailyLoad } from "./engine/weekly/insights";
+import { exposureE1rm } from "./engine/strength/e1rm";
+import { setsPerMuscle } from "./engine/strength/volume";
 import { weeklyReview, type WeekData, type WeeklyReview } from "./engine/weekly/review";
 import { planWeek, type WeekPlan } from "./engine/weekly/scheduler";
 import type {
@@ -16,6 +19,7 @@ import type {
   CardioSlot,
   Exercise,
   Exposure,
+  Muscle,
   ProgramDay,
   ProgramExercise,
   Readiness,
@@ -23,8 +27,11 @@ import type {
   StrengthPrescription,
 } from "./engine/types";
 import type {
+  BodyMeasurementRec,
   CalibrationRec,
   CardioSessionRec,
+  MobilityLogRec,
+  ProgressPhotoRec,
   RehabLogRec,
   SessionExerciseRec,
   SetLogRec,
@@ -42,6 +49,9 @@ export interface Snapshot {
   cardio: CardioSessionRec[];
   rehab: RehabLogRec[];
   calibrations: CalibrationRec[];
+  body: BodyMeasurementRec[];
+  photos: ProgressPhotoRec[];
+  mobility: MobilityLogRec[];
 }
 
 const alive = <T extends { deletedAt?: string | null }>(xs: T[]) => xs.filter((x) => !x.deletedAt);
@@ -388,4 +398,210 @@ export function weeklyStats(s: Snapshot, today: string, weeks: number): WeekStat
     out[i].cardioKm += c.distanceKm ?? 0;
   }
   return out;
+}
+
+// ---------- Dark-design dashboard / insights helpers ----------
+
+/** Estimated session length range for a program day, from its actual prescriptions. */
+export function dayMinutes(s: Snapshot, day: ProgramDay, date: string): [number, number] {
+  return estimateMinutes(
+    prescribeDay(s, day, date).map(({ exercise, prescription }) => ({
+      sets: prescription.sets.length,
+      restSec: prescription.restSec,
+      isCompound: exercise.isCompound,
+    })),
+  );
+}
+
+/** Weekly counters for the dashboard chips. */
+export function weekCounts(s: Snapshot, today: string) {
+  const start = weekStart(today);
+  const end = addDays(start, 6);
+  const inWeek = (d: string) => d >= start && d <= end;
+  const strengthDone = completedSessions(s).filter((x) => inWeek(x.date)).length;
+  const planned = PROGRAM.filter((d) => d.category !== "rest");
+  const dueToDate = planned.filter((d) => addDays(start, d.weekday - 1) <= today).length;
+  const cardioDone = alive(s.cardio).filter((c) => inWeek(c.date)).length;
+  const mobilityDone = new Set(alive(s.mobility).filter((m) => m.completed && inWeek(m.date)).map((m) => m.date)).size;
+  return {
+    strengthDone,
+    strengthPlanned: planned.length,
+    strengthDueToDate: Math.max(dueToDate, strengthDone),
+    cardioDone,
+    cardioPlanned: 3,
+    mobilityDone,
+    mobilityPlanned: 3,
+  };
+}
+
+/** Training volume (kg) per weekday of the current week, Monday first. */
+export function dailyVolumeThisWeek(s: Snapshot, today: string): Array<{ date: string; tonnage: number; trained: boolean }> {
+  const start = weekStart(today);
+  const sessions = completedSessions(s);
+  const dateOf = new Map(sessions.map((x) => [x.id, x.date]));
+  const out = Array.from({ length: 7 }, (_, i) => ({ date: addDays(start, i), tonnage: 0, trained: false }));
+  for (const x of sessions) {
+    const i = daysBetween(start, x.date);
+    if (i >= 0 && i < 7) out[i].trained = true;
+  }
+  for (const c of alive(s.cardio)) {
+    const i = daysBetween(start, c.date);
+    if (i >= 0 && i < 7) out[i].trained = true;
+  }
+  for (const set of alive(s.sets)) {
+    if (set.kind !== "working") continue;
+    const d = dateOf.get(set.sessionId);
+    if (!d) continue;
+    const i = daysBetween(start, d);
+    if (i >= 0 && i < 7) out[i].tonnage += set.weight * set.reps;
+  }
+  return out;
+}
+
+/** Session-RPE load per day: strength (duration × session RPE) + cardio (minutes × RPE). */
+export function dailyLoads(s: Snapshot): DailyLoad[] {
+  const byDate = new Map<string, number>();
+  const add = (date: string, load: number) => byDate.set(date, (byDate.get(date) ?? 0) + load);
+  for (const x of completedSessions(s)) {
+    const minutes =
+      x.completedAt && x.startedAt ? Math.min(150, Math.max(20, (Date.parse(x.completedAt) - Date.parse(x.startedAt)) / 60000)) : 60;
+    add(x.date, minutes * (x.sessionRpe ?? 7));
+  }
+  for (const c of alive(s.cardio)) add(c.date, c.durationMin * c.rpe);
+  return [...byDate.entries()].map(([date, load]) => ({ date, load }));
+}
+
+export type InsightPeriod = "week" | "month" | "year";
+const PERIOD_DAYS: Record<InsightPeriod, number> = { week: 7, month: 28, year: 365 };
+
+/** Average relative change in best e1RM, current window vs the window before (or first vs last within it). */
+function strengthChange(s: Snapshot, today: string, days: number): number | null {
+  const from = addDays(today, -days);
+  const prevFrom = addDays(today, -2 * days);
+  const changes: number[] = [];
+  for (const list of exposuresByExercise(s).values()) {
+    const work = list.filter((e) => !e.isDeload);
+    const cur = work.filter((e) => e.date > from && e.date <= today);
+    if (!cur.length) continue;
+    const prev = work.filter((e) => e.date > prevFrom && e.date <= from);
+    const base = prev.length ? Math.max(...prev.map(exposureE1rm)) : cur.length > 1 ? exposureE1rm(cur[0]) : null;
+    if (!base) continue;
+    changes.push(Math.max(...cur.map(exposureE1rm)) / base - 1);
+  }
+  return changes.length ? changes.reduce((a, b) => a + b, 0) / changes.length : null;
+}
+
+/** Strength index per bucket: mean of (best e1RM in bucket / exercise's first e1RM). */
+function strengthSeries(s: Snapshot, today: string, bucketDays: number, buckets: number): Array<number | null> {
+  const lists = [...exposuresByExercise(s).values()].map((l) => l.filter((e) => !e.isDeload)).filter((l) => l.length);
+  return Array.from({ length: buckets }, (_, i) => {
+    const to = addDays(today, -bucketDays * (buckets - 1 - i));
+    const from = addDays(to, -bucketDays);
+    const vals = lists
+      .map((l) => {
+        const inB = l.filter((e) => e.date > from && e.date <= to);
+        return inB.length ? Math.max(...inB.map(exposureE1rm)) / exposureE1rm(l[0]) : null;
+      })
+      .filter((v): v is number => v != null);
+    return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+  });
+}
+
+function cardioMetric(s: Snapshot) {
+  const logs = cardioLogs(s).filter((l) => l.kind !== "intervals" && l.completed);
+  const counts = new Map<string, number>();
+  for (const l of logs) if (l.intensity != null) counts.set(l.modality, (counts.get(l.modality) ?? 0) + 1);
+  const modality = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+  // Zone 2 capacity: intensity you hold at easy effort (falls back to minutes when intensity isn't logged).
+  return modality
+    ? { logs: logs.filter((l) => l.modality === modality && l.intensity != null), value: (l: CardioLog) => l.intensity! }
+    : { logs, value: (l: CardioLog) => l.durationMin };
+}
+
+function avg(xs: number[]) {
+  return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
+}
+
+export function insights(s: Snapshot, today: string, period: InsightPeriod) {
+  const days = PERIOD_DAYS[period];
+  const from = addDays(today, -days);
+  const bucketDays = period === "year" ? 30 : 7;
+  const buckets = period === "year" ? 12 : 8;
+
+  const cm = cardioMetric(s);
+  const cur = avg(cm.logs.filter((l) => l.date > from && l.date <= today).map(cm.value));
+  const prevLogs = cm.logs.filter((l) => l.date > addDays(today, -2 * days) && l.date <= from);
+  const prev = prevLogs.length ? avg(prevLogs.map(cm.value)) : null;
+  const cardioPct = cur != null && prev ? cur / prev - 1 : null;
+  const cardioSeries = Array.from({ length: buckets }, (_, i) => {
+    const to = addDays(today, -bucketDays * (buckets - 1 - i));
+    return avg(cm.logs.filter((l) => l.date > addDays(to, -bucketDays) && l.date <= to).map(cm.value));
+  });
+
+  const sessionsInPeriod = completedSessions(s).filter((x) => x.date > from && x.date <= today);
+  const readiness = sessionsInPeriod.map((x) => x.readiness).filter((r): r is Readiness => !!r);
+  const recovery = avg(readiness.map(readinessScore));
+  const sleep = avg(readiness.map((r) => r.sleepHours).filter((h): h is number => typeof h === "number"));
+
+  const { ratio } = acwr(dailyLoads(s), today);
+  const week = addDays(today, -7);
+  const rehabWeek = alive(s.rehab).filter((r) => r.date > week && r.date <= today);
+  const morning = rehabWeek.map((r) => r.painNextMorning).filter((p): p is number => p != null);
+  const lastWeekReadiness = avg(
+    completedSessions(s)
+      .filter((x) => x.date > week && x.readiness)
+      .map((x) => readinessScore(x.readiness!)),
+  );
+  const risk = injuryRisk({
+    ratio,
+    morningPainOverBaseline: morning.length ? Math.max(...morning) - s.settings.rehab.baselineMorningPain : null,
+    maxPainDuring: rehabWeek.length ? Math.max(...rehabWeek.map((r) => r.painDuring)) : null,
+    readiness: lastWeekReadiness,
+  });
+
+  return {
+    strength: { pct: strengthChange(s, today, days), series: strengthSeries(s, today, bucketDays, buckets) },
+    cardio: { pct: cardioPct, series: cardioSeries },
+    /** 0–10 (readiness 1–5 mapped). */
+    recovery: recovery == null ? null : (recovery - 1) * 2.5,
+    sleepHours: sleep,
+    load: { status: loadStatus(ratio), ratio },
+    risk,
+  };
+}
+
+/** Weekly working sets per muscle group vs a target range (Muskelgrupper screen). */
+export const GROUP_TARGETS: Record<"chest" | "back" | "shoulders" | "arms" | "legs", { label: string; muscles: Muscle[]; target: number }> = {
+  chest: { label: "Bröst", muscles: ["chest"], target: 16 },
+  back: { label: "Rygg", muscles: ["back"], target: 18 },
+  shoulders: { label: "Axlar", muscles: ["front_delts", "side_delts", "rear_delts"], target: 16 },
+  arms: { label: "Armar", muscles: ["biceps", "triceps"], target: 20 },
+  legs: { label: "Ben", muscles: ["quads", "hamstrings", "glutes", "adductors", "calves"], target: 28 },
+};
+
+export function groupVolume(s: Snapshot, today: string, weeks: number) {
+  const from = addDays(weekStart(today), -7 * (weeks - 1));
+  const prevFrom = addDays(from, -7 * weeks);
+  const entries = (a: string, b: string) => {
+    const out: Array<{ exerciseId: string; sets: number }> = [];
+    for (const [id, list] of exposuresByExercise(s)) for (const e of list) if (e.date >= a && e.date < b) out.push({ exerciseId: id, sets: e.sets.length });
+    return setsPerMuscle(out, EXERCISES);
+  };
+  const now = entries(from, "9999");
+  const before = entries(prevFrom, from);
+  return (Object.keys(GROUP_TARGETS) as Array<keyof typeof GROUP_TARGETS>).map((key) => {
+    const g = GROUP_TARGETS[key];
+    const sum = (x: Partial<Record<Muscle, number>>) => g.muscles.reduce((a, m) => a + (x[m] ?? 0), 0);
+    const perWeek = sum(now) / weeks;
+    const prevPerWeek = sum(before) / weeks;
+    const pct = perWeek / g.target;
+    return {
+      key,
+      label: g.label,
+      perWeek,
+      pct,
+      change: prevPerWeek > 0 ? perWeek / prevPerWeek - 1 : null,
+      status: (pct < 0.7 ? "low" : pct > 1.15 ? "high" : "optimal") as "low" | "optimal" | "high",
+    };
+  });
 }

@@ -37,7 +37,7 @@ function allSlots() {
     }
     if (ids.size === 0) throw new Error(`Inga id:n hittades för ${fam.prefix} i ${files.join(", ")}`);
     for (const id of [...ids].sort()) {
-      slots.push({ key: `${fam.prefix}/${id}`, source: `${fam.dir}/${id}`, label: `${fam.label}: ${id}`, guide: fam.guide, crops: fam.crops });
+      slots.push({ key: `${fam.prefix}/${id}`, source: `${fam.dir}/${id}`, label: `${fam.label}: ${id}`, guide: fam.guide, crops: fam.crops, grade: fam.grade });
     }
   }
   return slots;
@@ -63,10 +63,30 @@ function findSources() {
   return out;
 }
 
-async function blurDataUri(file, aspect, position) {
+async function blurDataUri(input, aspect, position) {
   const w = 24;
-  const buf = await sharp(file).rotate().resize(w, Math.round(w / aspect), { fit: "cover", position }).webp({ quality: 40 }).toBuffer();
+  const buf = await sharp(input).resize(w, Math.round(w / aspect), { fit: "cover", position }).webp({ quality: 40 }).toBuffer();
   return `data:image/webp;base64,${buf.toString("base64")}`;
+}
+
+/**
+ * Dark-theme grade: per-channel x² (darkens the bright backdrop far more than mid-tones and
+ * keeps tone order – no solarising), scaled by `gain`, then an optional warm tint (B&W images only).
+ */
+async function applyGrade(file, grade) {
+  const rgb = await sharp(file).rotate().removeAlpha().png().toBuffer();
+  if (!grade) return rgb;
+  const sq = await sharp(rgb).composite([{ input: rgb, blend: "multiply" }]).linear(grade.gain, 0).png().toBuffer();
+  // tint() makes a duotone – right for the B&W studio shots, wrong for colour photos.
+  if (!grade.tint) return sq;
+  const [r, g, b] = grade.tint;
+  return sharp(sq).tint({ r, g, b }).png().toBuffer();
+}
+
+function vignetteSvg(w, h, strength) {
+  return Buffer.from(
+    `<svg width="${w}" height="${h}"><defs><radialGradient id="v" cx="0.5" cy="0.48" r="0.72"><stop offset="0.38" stop-color="#0b0b0b" stop-opacity="0"/><stop offset="1" stop-color="#0b0b0b" stop-opacity="${strength}"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#v)"/></svg>`,
+  );
 }
 
 async function main() {
@@ -102,6 +122,9 @@ async function main() {
     const srcH = rotated ? meta.width : meta.height;
     const entry = { crops: {} };
     const bytes = fs.readFileSync(file);
+    const grade = slot.grade ? CONFIG.grades[slot.grade] : null;
+    if (slot.grade && !grade) throw new Error(`Okänd gradering "${slot.grade}" för ${slot.key}`);
+    const graded = await applyGrade(file, grade);
 
     for (const crop of slot.crops) {
       // Largest crop that fits inside the source at this aspect ratio.
@@ -111,13 +134,16 @@ async function main() {
         widths = [maxW];
         console.warn(`! ${slot.source}: källan är liten (${srcW}×${srcH}) – ${crop.name} blir bara ${maxW}px bred. Rekommenderat minst ${crop.widths.at(-1)}px.`);
       } else if (widths.length < crop.widths.length) {
-        console.warn(`! ${slot.source}: för liten för ${crop.widths.at(-1)}px (${crop.name}); använder upp till ${widths.at(-1)}px.`);
+        // Use the full source width as the top size rather than stopping at the previous step.
+        if (maxW > widths.at(-1)) widths = [...widths, maxW];
+        console.warn(`! ${slot.source}: mindre än rekommenderat (${crop.widths.at(-1)}px för ${crop.name}); största storlek blir ${widths.at(-1)}px.`);
       }
       const dir = path.join(OUT_DIR, slot.key);
       fs.mkdirSync(dir, { recursive: true });
       for (const w of widths) {
         const h = Math.round(w / crop.aspect);
-        const base = sharp(file).rotate().resize(w, h, { fit: "cover", position: crop.position ?? "attention" });
+        let base = sharp(graded).resize(w, h, { fit: "cover", position: crop.position ?? "attention" });
+        if (grade?.vignette) base = sharp(await base.png().toBuffer()).composite([{ input: vignetteSvg(w, h, grade.vignette) }]);
         await base.clone().avif({ quality: 55, effort: 6 }).toFile(path.join(dir, `${crop.name}-${w}.avif`));
         await base.clone().webp({ quality: 80, effort: 6 }).toFile(path.join(dir, `${crop.name}-${w}.webp`));
         files += 2;
@@ -125,9 +151,9 @@ async function main() {
       entry.crops[crop.name] = {
         aspect: crop.aspect,
         widths,
-        blur: await blurDataUri(file, crop.aspect, crop.position ?? "attention"),
+        blur: await blurDataUri(graded, crop.aspect, crop.position ?? "attention"),
         // Content version: changes when the source or crop settings change (images are cached immutably).
-        v: crypto.createHash("sha1").update(bytes).update(JSON.stringify({ ...crop, widths })).digest("hex").slice(0, 10),
+        v: crypto.createHash("sha1").update(bytes).update(JSON.stringify({ ...crop, widths, grade })).digest("hex").slice(0, 10),
       };
     }
     manifest[slot.key] = entry;

@@ -15,35 +15,13 @@ import type { Exercise } from "@/lib/engine/types";
 import { EXERCISES } from "@/lib/program/exercises";
 import { PROGRAM } from "@/lib/program/program";
 import { useStore } from "@/lib/store";
+import { useFavorites } from "@/lib/favorites";
 
 const ACHILLES_TEXT = { none: "Ingen", low: "Låg", moderate: "Måttlig – låst till rehabfas 4", high: "Hög – kräver klartecken" };
-const FAV_KEY = "favorite-exercises";
-
-function useFavorite(id: string) {
-  const [favs, setFavs] = useState<string[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem(FAV_KEY) ?? "[]");
-    } catch {
-      return [];
-    }
-  });
-  const on = favs.includes(id);
-  const toggle = () => {
-    const next = on ? favs.filter((x) => x !== id) : [...favs, id];
-    setFavs(next);
-    try {
-      localStorage.setItem(FAV_KEY, JSON.stringify(next));
-    } catch {
-      /* ignore */
-    }
-  };
-  return [on, toggle] as const;
-}
-
 const fillsFor = (ex: Exercise): Fills => {
   const f: Fills = {};
-  for (const m of ex.secondary) f[m] = "#f7caa8";
-  f[ex.primary] = "var(--accent)";
+  for (const m of ex.secondary) f[m] = "#9a4d1e";
+  f[ex.primary] = "#ff8a3d";
   return f;
 };
 
@@ -52,7 +30,9 @@ export function ExerciseDetail({ id }: { id: string }) {
   const { s } = store;
   const ex = EXERCISES[id];
   const [tab, setTab] = useState<"overview" | "how" | "muscles" | "alt">("overview");
-  const [fav, toggleFav] = useFavorite(id);
+  const { favorites, toggle } = useFavorites();
+  const fav = favorites.includes(id);
+  const toggleFav = () => toggle(id);
   const [addOpen, setAddOpen] = useState(false);
   const [w, setW] = useState(0);
   const [r, setR] = useState(8);
@@ -90,14 +70,14 @@ export function ExerciseDetail({ id }: { id: string }) {
             alt={ex.name}
             className="mt-3 h-[190px] rounded-[18px]"
             fallback={
-              <div className="flex h-full items-center justify-center bg-[#2a2725]">
-                <AnatomyFigure view={showFront ? "front" : "back"} dark fills={fills} viewBox="28 30 144 210" className="h-full w-auto" />
+              <div className="flex h-full items-center justify-center bg-[#111]">
+                <AnatomyFigure view={showFront ? "front" : "back"} fills={fills} viewBox="28 30 144 210" className="h-full w-auto" />
               </div>
             }
           />
           <div className="mt-2 grid grid-cols-2 gap-2">
             {(["front", "back"] as const).map((v) => (
-              <div key={v} className="flex h-[100px] items-center justify-center overflow-hidden rounded-[14px] bg-[#e9e5df]">
+              <div key={v} className="flex h-[100px] items-center justify-center overflow-hidden rounded-[14px] bg-[#111]">
                 <AnatomyFigure view={v} fills={fills} viewBox="28 30 144 230" className="h-full w-auto" />
               </div>
             ))}
@@ -128,7 +108,7 @@ export function ExerciseDetail({ id }: { id: string }) {
             </ol>
           </Card>
 
-          {locked && <Card className="mt-3 bg-bad-soft text-[13px]">Låst i din nuvarande rehabfas – appen väljer automatiskt ett alternativ.</Card>}
+          {locked && <Card className="mt-3 border-bad/40 bg-bad-soft text-[13px]">Låst i din nuvarande rehabfas – appen väljer automatiskt ett alternativ.</Card>}
 
           <div className="mt-4 flex gap-2">
             <Button className="flex-1" onClick={() => setAddOpen(true)} disabled={locked}>
@@ -137,7 +117,7 @@ export function ExerciseDetail({ id }: { id: string }) {
             <button
               aria-label={fav ? "Ta bort favorit" : "Spara som favorit"}
               onClick={toggleFav}
-              className="flex size-12 items-center justify-center rounded-full border border-line bg-card"
+              className={cn("flex size-12 items-center justify-center rounded-full border", fav ? "border-accent/60 bg-accent-soft text-accent" : "border-line bg-card")}
             >
               <Bookmark size={18} fill={fav ? "currentColor" : "none"} />
             </button>
@@ -156,7 +136,7 @@ export function ExerciseDetail({ id }: { id: string }) {
           </Card>
 
           <SectionTitle>Kalibrering</SectionTitle>
-          <Card className="space-y-2 bg-card-2/50 p-2">
+          <Card className="space-y-2 p-2">
             <p className="px-2 pt-1 text-[12px] text-ink-2">
               {cal ? `Senast: ${kg(cal.weight)} kg × ${cal.reps} @ RIR ${cal.rir} (${cal.date}).` : "Ange en nylig prestation om övningen saknar historik här."}
             </p>
@@ -178,7 +158,7 @@ export function ExerciseDetail({ id }: { id: string }) {
               </li>
             ))}
           </ol>
-          {ex.tips.map((t) => <p key={t} className="mt-3 rounded-[14px] bg-card-2 p-3 text-[13px]">💡 {t}</p>)}
+          {ex.tips.map((t) => <p key={t} className="mt-3 rounded-[14px] border border-line bg-card-2 p-3 text-[13px]">💡 {t}</p>)}
         </Card>
       )}
 
@@ -198,7 +178,7 @@ export function ExerciseDetail({ id }: { id: string }) {
       {tab === "alt" && (
         <div className="mt-3 space-y-2">
           {ex.alternatives.map((a) => EXERCISES[a]).filter(Boolean).map((a) => (
-            <Link key={a.id} href={`/library/${a.id}`} className="flex items-center gap-3 rounded-[16px] bg-card p-2">
+            <Link key={a.id} href={`/library/${a.id}`} className="surface flex items-center gap-3 rounded-[16px] p-2">
               <Photo
                 slot={IMAGES.exercise(a.id)}
                 crop="square"
@@ -206,7 +186,7 @@ export function ExerciseDetail({ id }: { id: string }) {
                 alt=""
                 className="h-12 w-12 shrink-0 rounded-[10px]"
                 fallback={
-                  <div className="h-full bg-[#e9e5df]">
+                  <div className="h-full bg-[#111]">
                     <AnatomyFigure view="front" fills={fillsFor(a)} viewBox="40 40 120 120" className="h-full w-full" />
                   </div>
                 }
@@ -238,7 +218,7 @@ export function ExerciseDetail({ id }: { id: string }) {
                   await store.updateSettings({ substitutions: subs });
                   setAddOpen(false);
                 }}
-                className={cn("flex w-full items-center justify-between rounded-[14px] bg-card p-3 text-left text-[13px]", isSame && "opacity-50")}
+                className={cn("surface flex w-full items-center justify-between rounded-[14px] p-3 text-left text-[13px]", isSame && "opacity-50")}
               >
                 <span>
                   <span className="block font-semibold">{day.name}</span>

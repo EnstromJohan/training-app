@@ -1,12 +1,23 @@
 {
-  "$comment": "Image slots, mirroring the design mockup. Source files go in assets/images/<source>.<ext>; run `npm run images`. Each crop is generated in several widths as AVIF + WebP with a blur placeholder.",
+  "$comment": "Image slots, mirroring the design mockup. Source files go in assets/images/<source>.<ext>; run `npm run images`. Each crop is generated in several widths as AVIF + WebP with a blur placeholder. Optional 'grade' darkens images for the dark theme: squared luminance × gain, warm tint, per-crop vignette.",
   "slots": [
     {
       "key": "hero-home",
       "source": "hero-home",
       "label": "Startsidans hero",
       "guide": "Mörk, dramatisk porträttbild (t.ex. vältränad person mot berg i skymning). Motivet i övre högra halvan – hälsningen ligger uppe till vänster och veckoremsan + knappen i nedre tredjedelen, som ska vara mörk.",
-      "crops": [{ "name": "main", "aspect": 0.7, "widths": [430, 860, 1290], "position": "north" }],
+      "crops": [
+        {
+          "name": "main",
+          "aspect": 0.7,
+          "widths": [
+            430,
+            860,
+            1290
+          ],
+          "position": "north"
+        }
+      ],
       "priority": true
     },
     {
@@ -14,7 +25,17 @@
       "source": "avatar",
       "label": "Profilbild",
       "guide": "Ansikte, centrerat.",
-      "crops": [{ "name": "main", "aspect": 1, "widths": [96, 192], "position": "attention" }]
+      "crops": [
+        {
+          "name": "main",
+          "aspect": 1,
+          "widths": [
+            96,
+            192
+          ],
+          "position": "attention"
+        }
+      ]
     },
     {
       "key": "cardio",
@@ -22,9 +43,27 @@
       "label": "Cardiopassets hero + Nästa steg-miniatyr",
       "guide": "Konditionsbild i landskap (löpare/cyklist i berg). Motivet till höger – tidringen ligger över vänstra halvan.",
       "crops": [
-        { "name": "hero", "aspect": 1.55, "widths": [400, 800, 1200], "position": "attention" },
-        { "name": "thumb", "aspect": 1, "widths": [104, 208], "position": "attention" }
-      ]
+        {
+          "name": "hero",
+          "aspect": 1.55,
+          "widths": [
+            400,
+            800,
+            1200
+          ],
+          "position": "attention"
+        },
+        {
+          "name": "thumb",
+          "aspect": 1,
+          "widths": [
+            104,
+            208
+          ],
+          "position": "east"
+        }
+      ],
+      "grade": "soft"
     },
     {
       "key": "rehab",
@@ -32,37 +71,96 @@
       "label": "Rehab-hero + rehabkortet under vilan",
       "guide": "Fötter/vader på ett steg (tåhävning), gärna ljus bakgrund. Motivet centrerat.",
       "crops": [
-        { "name": "hero", "aspect": 2.4, "widths": [400, 800, 1200], "position": "attention" },
-        { "name": "card", "aspect": 0.83, "widths": [120, 240], "position": "attention" }
-      ]
+        {
+          "name": "hero",
+          "aspect": 2.4,
+          "widths": [
+            400,
+            800,
+            1200
+          ],
+          "position": "attention"
+        },
+        {
+          "name": "card",
+          "aspect": 0.83,
+          "widths": [
+            120,
+            240
+          ],
+          "position": "attention"
+        }
+      ],
+      "grade": "photo"
     },
     {
       "key": "rest-day",
       "source": "rest-day",
       "label": "Vilodag i veckoschemat",
       "guide": "Lugnt, ljust berglandskap. Vänstra delen lugn (texten ligger där).",
-      "crops": [{ "name": "main", "aspect": 4.6, "widths": [400, 800], "position": "centre" }]
+      "crops": [
+        {
+          "name": "main",
+          "aspect": 4.6,
+          "widths": [
+            400,
+            800
+          ],
+          "position": "centre"
+        }
+      ],
+      "grade": "photo"
     },
     {
       "key": "schedule/chest_back",
       "source": "schedule/chest_back",
       "label": "Schemaminiatyr – Bröst + Rygg",
       "guide": "Anatomirender av överkroppen med bröst/rygg markerade, mörk eller neutral bakgrund.",
-      "crops": [{ "name": "main", "aspect": 1.47, "widths": [176, 264], "position": "attention" }]
+      "crops": [
+        {
+          "name": "main",
+          "aspect": 1.47,
+          "widths": [
+            176,
+            264
+          ],
+          "position": "attention"
+        }
+      ]
     },
     {
       "key": "schedule/legs",
       "source": "schedule/legs",
       "label": "Schemaminiatyr – Ben",
       "guide": "Anatomirender av benen med lår markerade.",
-      "crops": [{ "name": "main", "aspect": 1.47, "widths": [176, 264], "position": "attention" }]
+      "crops": [
+        {
+          "name": "main",
+          "aspect": 1.47,
+          "widths": [
+            176,
+            264
+          ],
+          "position": "attention"
+        }
+      ]
     },
     {
       "key": "schedule/shoulders_arms",
       "source": "schedule/shoulders_arms",
       "label": "Schemaminiatyr – Axlar + Armar",
       "guide": "Anatomirender av axlar/armar markerade.",
-      "crops": [{ "name": "main", "aspect": 1.47, "widths": [176, 264], "position": "attention" }]
+      "crops": [
+        {
+          "name": "main",
+          "aspect": 1.47,
+          "widths": [
+            176,
+            264
+          ],
+          "position": "attention"
+        }
+      ]
     }
   ],
   "families": [
@@ -74,18 +172,71 @@
       "label": "Övningsbild",
       "guide": "Övningen i utförande (eller anatomirender med musklerna markerade). Liggande bild, motivet centrerat.",
       "crops": [
-        { "name": "wide", "aspect": 2.1, "widths": [430, 860, 1290], "position": "attention" },
-        { "name": "square", "aspect": 1, "widths": [96, 192], "position": "attention" }
-      ]
+        {
+          "name": "wide",
+          "aspect": 2.1,
+          "widths": [
+            430,
+            860,
+            1290
+          ],
+          "position": "attention"
+        },
+        {
+          "name": "square",
+          "aspect": 1,
+          "widths": [
+            96,
+            192
+          ],
+          "position": "attention"
+        }
+      ],
+      "grade": "studio"
     },
     {
       "prefix": "rehab-exercise",
       "dir": "rehab",
-      "idSource": ["src/lib/engine/rehab/achilles.ts", "src/lib/program/prehab.ts"],
+      "idSource": [
+        "src/lib/engine/rehab/achilles.ts",
+        "src/lib/program/prehab.ts"
+      ],
       "idPattern": "(?:ex|x)\\(\\s*\"([a-z0-9-]+)\"",
       "label": "Rehaböxning",
       "guide": "Övningen i utförande, kvadratisk beskärning.",
-      "crops": [{ "name": "square", "aspect": 1, "widths": [96, 192], "position": "attention" }]
+      "crops": [
+        {
+          "name": "square",
+          "aspect": 1,
+          "widths": [
+            96,
+            192
+          ],
+          "position": "attention"
+        }
+      ],
+      "grade": "photo"
     }
-  ]
+  ],
+  "grades": {
+    "studio": {
+      "gain": 0.5,
+      "tint": [
+        255,
+        238,
+        222
+      ],
+      "vignette": 0.9
+    },
+    "photo": {
+      "gain": 0.62,
+      "tint": null,
+      "vignette": 0.85
+    },
+    "soft": {
+      "gain": 0.82,
+      "tint": null,
+      "vignette": 0.55
+    }
+  }
 }

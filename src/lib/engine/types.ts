@@ -102,6 +102,8 @@ export interface Readiness {
   sleep: number; // 1–5
   energy: number; // 1–5
   soreness: number; // 1–5, 5 = no soreness
+  /** Hours slept last night (optional, for the sleep insight). */
+  sleepHours?: number | null;
 }
 
 export interface CalibrationInput {

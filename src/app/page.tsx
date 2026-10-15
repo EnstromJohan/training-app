@@ -2,29 +2,38 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, Dumbbell, Footprints, HeartPulse } from "lucide-react";
+import { ArrowRight, Clock, Dumbbell, Footprints, HeartPulse } from "lucide-react";
 import { HeroArt } from "@/components/hero-art";
 import { IMAGES, Photo } from "@/components/photo";
 import { ReadinessSheet } from "@/components/readiness-sheet";
-import { Scale, cn } from "@/components/ui";
+import { SessionThumb } from "@/components/anatomy";
+import { IconCircle, Ring, Scale, cn } from "@/components/ui";
 import {
-  cardioWeek,
+  dailyVolumeThisWeek,
+  dayMinutes,
   deloadRecommendation,
   inProgressSession,
   pendingMorningCheck,
-  reviewWeek,
+  weekCounts,
   weekPlan,
-  weeklyStats,
 } from "@/lib/coach";
-import { addDays, fromIso, weekStart } from "@/lib/engine/weekly/dates";
+import { addDays, fromIso, isoWeek, weekStart, weekday } from "@/lib/engine/weekly/dates";
 import { PROGRAM_BY_ID } from "@/lib/program/program";
 import { useStore, today } from "@/lib/store";
 
-const WD = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"];
+const WD_LETTER = ["M", "T", "O", "T", "F", "L", "S"];
+const WD_LONG = ["måndag", "tisdag", "onsdag", "torsdag", "fredag", "lördag", "söndag"];
 
 function greeting() {
   const h = new Date().getHours();
   return h < 10 ? "God morgon," : h < 17 ? "Hej," : "God kväll,";
+}
+
+function dateLine(iso: string) {
+  const d = fromIso(iso);
+  const day = WD_LONG[weekday(iso) - 1];
+  const month = d.toLocaleDateString("sv-SE", { month: "short" }).replace(".", "");
+  return `${day[0].toUpperCase()}${day.slice(1)} ${d.getDate()} ${month} · Vecka ${isoWeek(iso)}`;
 }
 
 export default function Dashboard() {
@@ -34,169 +43,173 @@ export default function Dashboard() {
   const plan = weekPlan(s, t);
   const active = inProgressSession(s);
   const todayPlan = plan.days.find((d) => d.date === t);
-  const todayDay = todayPlan?.programDayId ? PROGRAM_BY_ID[todayPlan.programDayId] : null;
-  const doneToday = todayPlan?.status === "completed";
-  const nextDay = plan.next ? PROGRAM_BY_ID[plan.next.programDayId] : null;
-  const shown = active ? PROGRAM_BY_ID[active.programDayId] : todayDay ?? nextDay;
-  const cardio = cardioWeek(s, t);
-  const slot = shown?.cardioSlot;
-  const cardioPlan = slot && cardio.pending.includes(slot) ? cardio.plan[slot] : undefined;
+  const todayDay = todayPlan?.programDayId && todayPlan.status === "planned" ? PROGRAM_BY_ID[todayPlan.programDayId] : null;
+  const nextDay = active ? PROGRAM_BY_ID[active.programDayId] : (todayDay ?? (plan.next ? PROGRAM_BY_ID[plan.next.programDayId] : null));
+  const nextIsToday = !!active || !!todayDay;
+  const counts = weekCounts(s, t);
+  const volume = dailyVolumeThisWeek(s, t);
+  const maxVol = Math.max(1, ...volume.map((v) => v.tonnage));
+  const minutes = nextDay ? dayMinutes(s, nextDay, plan.next?.date ?? t) : null;
   const morning = pendingMorningCheck(s, t);
   const deload = deloadRecommendation(s, t);
   const isDeload = s.settings.deloadWeeks.includes(weekStart(t));
-  const stats = weeklyStats(s, t, 16);
-  const review = reviewWeek(s, t);
   const [sheet, setSheet] = useState(false);
   const [pain, setPain] = useState<number | null>(null);
 
-  const maxTon = Math.max(1, ...stats.map((x) => x.tonnage));
-  // Compare the last full week with the week before (the current week is still in progress).
-  const last = stats.at(-2)?.tonnage ?? 0;
-  const prev = stats.at(-3)?.tonnage ?? 0;
-  const delta = prev > 0 ? Math.round(((last - prev) / prev) * 100) : null;
-  const initials = (s.settings.name || "?").slice(0, 1).toUpperCase();
-
-  const subline = active ? "Pågående pass" : doneToday ? "Dagens pass är klart" : todayDay ? "Dags att köra" : nextDay ? `Nästa pass · ${WD[(fromIso(plan.next!.date).getDay() + 6) % 7].toLowerCase()}` : "Veckan är klar";
+  const stats = [
+    { icon: Dumbbell, label: "Styrka", value: `${counts.strengthDone}/${counts.strengthDueToDate || counts.strengthPlanned}`, href: "/workout" },
+    { icon: HeartPulse, label: "Cardio", value: `${counts.cardioDone}/${counts.cardioPlanned}`, href: "/cardio" },
+    { icon: Footprints, label: "Rörlighet", value: `${counts.mobilityDone}/${counts.mobilityPlanned}`, href: "/rehab" },
+  ];
 
   return (
-    <div className="-mx-4 text-white">
+    <div className="-mx-4">
       {/* Hero */}
-      <section className="relative overflow-hidden px-5 pb-6 pt-[max(1rem,env(safe-area-inset-top))]">
+      <section className="relative h-[430px] overflow-hidden px-5 pt-[max(1rem,env(safe-area-inset-top))]">
         <Photo slot={IMAGES.heroHome} priority sizes="(max-width: 448px) 100vw, 448px" alt="" className="absolute inset-0" fallback={<HeroArt />} />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-hero" />
-        <div className="relative">
-          <div className="flex items-start justify-between pt-3">
-            <h1 className="font-serif text-[40px] leading-[0.92]">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/5 via-40% to-bg" />
+        <div className="relative flex items-start justify-between pt-6">
+          <div>
+            <h1 className="text-[30px] font-bold leading-[1.08] tracking-tight drop-shadow">
               {greeting()}
               <br />
-              <span className="text-[50px]">{s.settings.name || "du"}</span>
+              {s.settings.name || "du"}
             </h1>
-            <Link href="/settings" aria-label="Profil" className="mt-1 block size-11 overflow-hidden rounded-full ring-2 ring-white/80">
-              <Photo slot={IMAGES.avatar} sizes="44px" alt="" className="size-full" fallback={<div className="flex size-full items-center justify-center bg-accent text-lg font-semibold text-ink">{initials}</div>} />
-            </Link>
+            <p className="mt-2 text-[13px] text-ink-2">{dateLine(t)}</p>
+            {isDeload && <p className="mt-1 text-[12px] font-medium text-accent-ink">Deloadvecka – lättare belastning</p>}
           </div>
-
-          <p className="mt-10 text-[13px] text-white/75">{subline}</p>
-          <p className="text-[19px] font-semibold">{doneToday && !active ? "Bra jobbat" : shown?.name ?? "Vila"}</p>
-          {isDeload && <p className="mt-1 text-[12px] text-accent">Deloadvecka – lättare belastning</p>}
-
-          <div className="mt-24 grid grid-cols-7 gap-1.5">
-            {plan.days.map((d, i) => {
-              const isToday = d.date === t;
-              return (
-                <div key={d.date} className={cn("flex flex-col items-center gap-1 rounded-full py-2.5", isToday ? "bg-accent text-ink" : "text-white")}>
-                  <span className={cn("text-[11px]", isToday ? "font-semibold" : "text-white/70")}>{WD[i]}</span>
-                  <span className="tabular text-[17px] font-semibold">{fromIso(d.date).getDate()}</span>
-                  <span className={cn("size-1 rounded-full", d.status === "completed" ? (isToday ? "bg-ink" : "bg-accent") : "bg-transparent")} />
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-6">
-            {active ? (
-              <Link href={`/workout/session?id=${active.id}`} className="relative flex h-14 items-center justify-center rounded-full bg-accent text-[16px] font-semibold text-ink">
-                Fortsätt pass <ArrowRight size={18} className="absolute right-6" />
-              </Link>
-            ) : todayDay && !doneToday ? (
-              <button onClick={() => setSheet(true)} className="relative flex h-14 w-full items-center justify-center rounded-full bg-accent text-[16px] font-semibold text-ink active:scale-[0.99]">
-                Starta pass <ArrowRight size={18} className="absolute right-6" />
-              </button>
-            ) : cardioPlan ? (
-              <Link href="/cardio" className="relative flex h-14 items-center justify-center rounded-full bg-accent text-[16px] font-semibold text-ink">
-                Starta cardio <ArrowRight size={18} className="absolute right-6" />
-              </Link>
-            ) : (
-              <Link href="/schedule" className="relative flex h-14 items-center justify-center rounded-full bg-white/10 text-[16px] font-semibold">
-                Se veckoschemat <ArrowRight size={18} className="absolute right-6" />
-              </Link>
-            )}
-          </div>
-
-          <div className="mt-6 grid grid-cols-3 gap-2">
-            {[
-              { icon: Dumbbell, label: "Styrka", sub: shown ? `${shown.exercises.length} övningar` : "Vila", href: "/workout" },
-              { icon: HeartPulse, label: "Cardio", sub: cardioPlan ? `${cardioPlan.durationMin} min` : "–", href: "/cardio" },
-              { icon: Footprints, label: "Rehab", sub: shown ? "Mellan set" : "Fristående", href: "/rehab" },
-            ].map(({ icon: Icon, label, sub, href }) => (
-              <Link key={label} href={href} className="flex items-center gap-2">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white/30">
-                  <Icon size={18} strokeWidth={1.6} />
-                </span>
-                <span>
-                  <span className="block text-[13px] font-semibold">{label}</span>
-                  <span className="block text-[11px] text-white/55">{sub}</span>
-                </span>
-              </Link>
-            ))}
-          </div>
+          <Link href="/schedule" className="flex flex-col items-center" aria-label="Veckans pass">
+            <Ring progress={counts.strengthDone / counts.strengthPlanned} size={92} stroke={6} track="rgba(255,255,255,0.12)" glow>
+              <span className="tabular text-[24px] font-bold leading-none">
+                {counts.strengthDone}/{counts.strengthPlanned}
+              </span>
+              <span className="mt-0.5 text-[9px] text-ink-2">träningspass</span>
+            </Ring>
+            <span className="mt-1.5 text-[11px] text-ink-2">Veckans pass</span>
+          </Link>
         </div>
       </section>
 
-      <div className="space-y-3 px-5">
-        {morning && (
-          <div className="rounded-[18px] bg-white/[0.06] p-4">
-            <div className="text-[14px] font-semibold">Hälsenan i morse?</div>
-            <p className="mb-3 text-[12px] text-white/55">Smärta/stelhet efter rehabpasset {morning.date}. Styr nästa rehabnivå.</p>
-            <div className="[&_button]:bg-white/10 [&_button]:text-white">
-              <Scale value={pain} onChange={setPain} labels={["Ingen", "Värsta"]} />
+      <div className="relative -mt-20 space-y-4 px-4">
+        {/* Weekly counters */}
+        <div className="grid grid-cols-3 divide-x divide-line">
+          {stats.map(({ icon: Icon, label, value, href }) => (
+            <Link key={label} href={href} className="flex items-center justify-center gap-2.5 px-1">
+              <IconCircle>
+                <Icon size={18} strokeWidth={1.7} />
+              </IconCircle>
+              <span>
+                <span className="block text-[12px] text-ink-2">{label}</span>
+                <span className="tabular block text-[15px] font-semibold">{value}</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+
+        {/* Next session */}
+        {nextDay ? (
+          <div className="surface rounded-[20px] p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-[72px] w-[60px] shrink-0 overflow-hidden rounded-[12px] border border-line bg-[#111]">
+                {nextDay.category !== "rest" && (
+                  <Photo
+                    slot={IMAGES.schedule(nextDay.category)}
+                    sizes="60px"
+                    alt=""
+                    className="size-full"
+                    fallback={<SessionThumb category={nextDay.category} />}
+                  />
+                )}
+              </div>
+              <div className="min-w-0">
+                <div className="text-[12px] text-muted">
+                  {active ? "Pågående pass" : nextIsToday ? "Dagens pass" : `Nästa pass · ${WD_LONG[weekday(plan.next!.date) - 1]}`}
+                </div>
+                <div className="truncate text-[20px] font-bold">{nextDay.name}</div>
+                {minutes && minutes[1] > 0 && (
+                  <div className="mt-0.5 flex items-center gap-1.5 text-[12px] text-ink-2">
+                    <Clock size={13} className="text-accent" /> {minutes[0]}–{minutes[1]} min
+                  </div>
+                )}
+              </div>
             </div>
-            <button disabled={pain == null} onClick={() => pain != null && store.setMorningPain(morning.id, pain)} className="mt-3 h-10 w-full rounded-full bg-white text-[14px] font-semibold text-ink disabled:opacity-40">
+            {active ? (
+              <Link href={`/workout/session?id=${active.id}`} className="bg-accent-grad glow relative mt-4 flex h-[52px] items-center justify-center rounded-full text-[16px] font-semibold text-on-accent">
+                Fortsätt pass <ArrowRight size={18} className="absolute right-5" />
+              </Link>
+            ) : nextIsToday ? (
+              <button onClick={() => setSheet(true)} className="bg-accent-grad glow relative mt-4 flex h-[52px] w-full items-center justify-center rounded-full text-[16px] font-semibold text-on-accent active:scale-[0.99]">
+                Starta pass <ArrowRight size={18} className="absolute right-5" />
+              </button>
+            ) : (
+              <Link href="/schedule" className="relative mt-4 flex h-[52px] items-center justify-center rounded-full border border-line bg-card-2 text-[15px] font-semibold">
+                Se veckoschemat <ArrowRight size={18} className="absolute right-5" />
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="surface rounded-[20px] p-4 text-[14px] text-ink-2">Veckans pass är klara. Vila, rörlighet och rehab står på schemat.</div>
+        )}
+
+        {/* This week */}
+        <div>
+          <h2 className="mb-2 text-[16px] font-semibold">Denna vecka</h2>
+          <div className="surface grid grid-cols-7 gap-1.5 rounded-[18px] p-2.5">
+            {volume.map((v, i) => {
+              const isToday = v.date === t;
+              const future = v.date > t;
+              const h = v.tonnage ? Math.max(28, (v.tonnage / maxVol) * 100) : 0;
+              return (
+                <Link key={v.date} href="/schedule" className="flex flex-col items-center gap-1.5">
+                  <div
+                    className={cn(
+                      "relative flex h-12 w-full items-end justify-center overflow-hidden rounded-[9px] border",
+                      isToday ? "border-accent/60" : "border-line",
+                      "bg-[#101010]",
+                    )}
+                  >
+                    {v.tonnage > 0 ? (
+                      <div className="bg-accent-grad glow-soft w-full rounded-[7px]" style={{ height: `${h}%` }} />
+                    ) : (
+                      <span className={cn("mb-3 size-1.5 rounded-full", v.trained ? "bg-accent" : future ? "bg-[#3a3a3a]" : "bg-[#2a2a2a]")} />
+                    )}
+                  </div>
+                  <span className={cn("text-[11px]", isToday ? "font-semibold text-accent" : "text-muted")}>{WD_LETTER[i]}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {morning && (
+          <div className="surface rounded-[18px] p-4">
+            <div className="text-[14px] font-semibold">Hälsenan i morse?</div>
+            <p className="mb-3 text-[12px] text-muted">Smärta/stelhet efter rehabpasset {morning.date}. Styr nästa rehabnivå.</p>
+            <Scale value={pain} onChange={setPain} labels={["Ingen", "Värsta"]} />
+            <button
+              disabled={pain == null}
+              onClick={() => pain != null && store.setMorningPain(morning.id, pain)}
+              className="bg-accent-grad mt-3 h-10 w-full rounded-full text-[14px] font-semibold text-on-accent disabled:opacity-40"
+            >
               Spara
             </button>
           </div>
         )}
 
         {deload.deload && !isDeload && (
-          <div className="rounded-[18px] bg-accent/15 p-4">
-            <div className="text-[14px] font-semibold text-accent">Deload rekommenderas</div>
-            <p className="mt-1 text-[13px] text-white/75">{deload.reason?.text}</p>
+          <div className="rounded-[18px] border border-accent/30 bg-accent-soft p-4">
+            <div className="text-[14px] font-semibold text-accent-ink">Deload rekommenderas</div>
+            <p className="mt-1 text-[13px] text-ink-2">{deload.reason?.text}</p>
             <div className="mt-3 flex gap-2">
-              <button className="h-9 rounded-full bg-accent px-4 text-[13px] font-semibold text-ink" onClick={() => store.updateSettings({ deloadWeeks: [...s.settings.deloadWeeks, weekStart(t)] })}>
+              <button className="bg-accent-grad h-9 rounded-full px-4 text-[13px] font-semibold text-on-accent" onClick={() => store.updateSettings({ deloadWeeks: [...s.settings.deloadWeeks, weekStart(t)] })}>
                 Denna vecka
               </button>
-              <button className="h-9 rounded-full bg-white/10 px-4 text-[13px]" onClick={() => store.updateSettings({ deloadWeeks: [...s.settings.deloadWeeks, addDays(weekStart(t), 7)] })}>
+              <button className="h-9 rounded-full border border-line bg-card-2 px-4 text-[13px]" onClick={() => store.updateSettings({ deloadWeeks: [...s.settings.deloadWeeks, addDays(weekStart(t), 7)] })}>
                 Nästa vecka
               </button>
             </div>
           </div>
         )}
-
-        {/* Veckans progression */}
-        <Link href="/progress" className="block pt-3">
-          <div className="text-[13px] text-white/70">Veckans progression</div>
-          <div className="mt-1 text-[30px] font-semibold text-accent">{delta == null ? "–" : `${delta >= 0 ? "+" : ""}${delta}%`}</div>
-          <div className="mt-3 flex h-28 items-end gap-[5px]" role="img" aria-label="Total volym per vecka, 16 veckor">
-            {stats.map((w, i) => {
-              const ratio = i / (stats.length - 1);
-              return (
-                <div
-                  key={w.weekStart}
-                  title={`${Math.round(w.tonnage)} kg`}
-                  className="flex-1 rounded-t-[4px]"
-                  style={{
-                    height: `${Math.max(4, (w.tonnage / maxTon) * 108)}px`,
-                    background: `linear-gradient(to top, rgba(245,168,119,${0.15 + ratio * 0.25}), rgba(245,168,119,${0.35 + ratio * 0.65}))`,
-                    opacity: w.tonnage ? 1 : 0.35,
-                  }}
-                />
-              );
-            })}
-          </div>
-          <div className="mt-2 flex justify-between border-t border-white/10 pt-2 text-[10px] text-white/45">
-            <span>16 v sedan</span>
-            <span>Denna vecka</span>
-          </div>
-        </Link>
-
-        <Link href="/coach" className="block rounded-[18px] bg-white/[0.06] p-4">
-          <div className="mb-2 text-[13px] text-white/70">Coach</div>
-          {review.focus.slice(0, 2).map((f, i) => (
-            <p key={i} className="text-[13px] leading-snug text-white/85">
-              {i + 1}. {f}
-            </p>
-          ))}
-        </Link>
       </div>
 
       <ReadinessSheet programDayId={todayDay?.id ?? null} open={sheet} onClose={() => setSheet(false)} />

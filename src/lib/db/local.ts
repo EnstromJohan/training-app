@@ -12,7 +12,8 @@ function strip<T>(row: Stored<T>): T {
  * marked dirty until the sync layer has pushed it to Supabase.
  */
 const DB_NAME = "training-app";
-const VERSION = 1;
+const VERSION = 2;
+const BLOBS = "photo_blobs";
 const META = "meta";
 
 export type Stored<T> = T & { _dirty?: number };
@@ -30,6 +31,7 @@ function db() {
           }
         }
         if (!d.objectStoreNames.contains(META)) d.createObjectStore(META);
+        if (!d.objectStoreNames.contains(BLOBS)) d.createObjectStore(BLOBS);
       },
     });
   }
@@ -64,6 +66,19 @@ export async function markClean<T extends TableName>(table: T, recs: Tables[T][]
     if (cur && cur.updatedAt === r.updatedAt) await tx.store.put({ ...cur, _dirty: 0 });
   }
   await tx.done;
+}
+
+/** Progress-photo image data (kept out of the synced tables). */
+export async function putBlob(id: string, blob: Blob): Promise<void> {
+  await (await db()).put(BLOBS, blob, id);
+}
+
+export async function getBlob(id: string): Promise<Blob | undefined> {
+  return (await db()).get(BLOBS, id);
+}
+
+export async function deleteBlob(id: string): Promise<void> {
+  await (await db()).delete(BLOBS, id);
 }
 
 export async function getMeta<V>(key: string): Promise<V | undefined> {

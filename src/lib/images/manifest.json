@@ -1,1 +1,1484 @@
-{}
+{
+  "hero-home": {
+    "crops": {
+      "main": {
+        "aspect": 0.7,
+        "widths": [
+          430,
+          860,
+          1049
+        ],
+        "blur": "data:image/webp;base64,UklGRqoAAABXRUJQVlA4IJ4AAADwBACdASoYACIAPuleqU2pJSQiNVgIASAdCUAZKYLNsdLB9R2YAPYWDK/wwjUYUAAA/uvc9eTuuNU59S7I/RTh6JjZiKpogIeRKH68oRxZwikOLYNZkbMb2RNXnkOk68oBP9Pg04CfzolaQGgkGUdrAhs2ICwM2cYDMKun4DMG8WdZRnH7GwQGBv1UCoZk3+apIC1ZBxq9VF5NfflgAA==",
+        "v": "3e8d54edcc"
+      }
+    }
+  },
+  "cardio": {
+    "crops": {
+      "hero": {
+        "aspect": 1.55,
+        "widths": [
+          400,
+          800,
+          1200
+        ],
+        "blur": "data:image/webp;base64,UklGRoQAAABXRUJQVlA4IHgAAADQAwCdASoYAA8APu1iqU2ppaQiMAgBMB2JZgCdACB9Pj6UWY2MSSAAyrOSMLQZ7Kcn1kMAupnZXXt6ghxSVDVcufjYY49t1WyMfTRNNJ46GUl6Q3zmC1VMhW4vpUoW/dNaI+ZR/EbBhlJdcv/4E1H+N4M03MBgAAA=",
+        "v": "e736c49049"
+      },
+      "thumb": {
+        "aspect": 1,
+        "widths": [
+          104,
+          208
+        ],
+        "blur": "data:image/webp;base64,UklGRrYAAABXRUJQVlA4IKoAAAAwBQCdASoYABgAPu1irE4ppaSiKA1RMB2JYgCdOUDhAIVAFCPiUBTgrJxQf8YDkXKxAAD+unrQhWAwI/2bX+zO1LIANu7SEfpMbw3zY7YaIKD9S7R6XLN7dLRXDZQG6RK7/y/0x8I2n9XHU0dcyAqQfBuQ9UbzqvWA08f23/sN4nCcjioBcv7hPXv3L92zIgAN1Ycd1BE90zr3srAIVptwYgXtBzqbdl/AAA==",
+        "v": "bae369ce74"
+      }
+    }
+  },
+  "rehab": {
+    "crops": {
+      "hero": {
+        "aspect": 2.4,
+        "widths": [
+          400,
+          800,
+          1200
+        ],
+        "blur": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAADQAwCdASoYAAoAPu1iqU2ppaOiMAgBMB2JZQDImBQTN7wBsjbGRAAA+vJgbpTjQEAPJ0RaKGV7TgpCWYL7D3pga3QZWXMCtBtdsE1nS3rDewQsv8CuifvpgAA=",
+        "v": "0a6c3aa722"
+      },
+      "card": {
+        "aspect": 0.83,
+        "widths": [
+          120,
+          240
+        ],
+        "blur": "data:image/webp;base64,UklGRpQAAABXRUJQVlA4IIgAAADwBACdASoYAB0APu1crE2ppKSiMBgMATAdiWcAACXDAoDzwfHn0Y+gOAkdoNoqBhAA+65I5xp/s65kZf1zNq4iRgi6hzx1L+INImPIjDwFIoMocev95WDzSdC7A1RuAyjg3uc8ejfprWBtetrotwxZVEFRVAGY8cVfck8zi/XuE2Rz2rXmAAAA",
+        "v": "5f8f9be84c"
+      }
+    }
+  },
+  "rest-day": {
+    "crops": {
+      "main": {
+        "aspect": 4.6,
+        "widths": [
+          400,
+          800
+        ],
+        "blur": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAADwAwCdASoYAAUAPu1iqU2ppaOiMAgBMB2JQBOmUABpnufNQ5gui14AAP0plddNSOTYDFRQwuRiqI7vJyc/4T98hgT7FtBpQz5p4WYGAjl4b1Nw27aY4MLGCDAAAA==",
+        "v": "8140105f3c"
+      }
+    }
+  },
+  "schedule/chest_back": {
+    "crops": {
+      "main": {
+        "aspect": 1.47,
+        "widths": [
+          176,
+          264
+        ],
+        "blur": "data:image/webp;base64,UklGRrQAAABXRUJQVlA4IKgAAADwAwCdASoYABAAPu1iqk2ppaQiMAgBMB2JQBWAA3Uh8f2K6KJMsH4AAP7w2u85Iuok+fdUxTbwpMIe2a3TIGUw9a6c7sHanQu9Lirzf47VHTkLXSJ/oM+FRSpJ6W4G3vJtfH1r5DmFfo//bpnIR+WyPbqtTwkbu3/eDV9TiCY29EP7YRCCo17xPo++2PT0JOO/niHe7sKZs3Vaef6yj9nNQUhCkDQAAAA=",
+        "v": "847c462be6"
+      }
+    }
+  },
+  "schedule/legs": {
+    "crops": {
+      "main": {
+        "aspect": 1.47,
+        "widths": [
+          176,
+          264
+        ],
+        "blur": "data:image/webp;base64,UklGRsYAAABXRUJQVlA4ILoAAACwBACdASoYABAAPu1iqU2ppaOiMAgBMB2JbACdDiIDFbynFCHXbxnO+YjZpF8AAP7d+VWB7pKKKNOHfipmxneT2SRWwgL2IlKx9QgH/kraiKWuoQ062E4mo5VA54/UX8F3fFG3RFlvBlvHjfvUTCcbD2Ap+g+V/9ia6Pco3zV9WayCerZlXLQO5u/4WX7n5PiXa0fRdOi0JcKFrZDUaopMJ8kN/9MT5sRMake6B8PgEMpo4VFUnmmwAAA=",
+        "v": "f2a611f948"
+      }
+    }
+  },
+  "schedule/shoulders_arms": {
+    "crops": {
+      "main": {
+        "aspect": 1.47,
+        "widths": [
+          176,
+          264
+        ],
+        "blur": "data:image/webp;base64,UklGRo4AAABXRUJQVlA4IIIAAAAwBACdASoYABAAPu1iqk2ppaQiMAgBMB2JQBifCYhe3L+2NBZoktQDWwAA/vDRnu3xc2WMxLOb6qXBoqW/JWOyjkLeuMvp4OjH1TAq1acvRVqNWlk/s5ZY6X1fHoVQ2Vs4Pg2/zP68n5RpVdmIltoyf+mgmU+JZwqELnCVfb9trgAA",
+        "v": "95c91d3930"
+      }
+    }
+  },
+  "exercise/adductor-machine": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADwAwCdASoYAAsAPu1kqU2ppaQiMAgBMB2JZwC06CFRoUCuPn6gyV9gAP7ZWksj/HCmpAFvxzTECePJkFzvTkZADYbTEIkrZ3kN+QZjRmibX6vAAAA=",
+        "v": "40aa875b3a"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAADwBACdASoYABgAPu1qrU8ppiQiMAgBMB2JZwC90CHfwIKtktgpvA/CHHWqHg2vRYAA/tjpNBbVwWN51CSfEMjeYpNO5MTN5G8/UY6i42xSNeTmz6sNLv8PQOz6qrnMWPpSVrE1JzLP82lcP5BPSAoAAAA=",
+        "v": "d0e2874111"
+      }
+    }
+  },
+  "exercise/back-extension": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAABwAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCo9CG6gnlbH+AA/uMTpKJBanK01CTW1Uugvy50nvATGRDfWASRJvNc4wwwjbt7Hg3usbhQyAAA",
+        "v": "a78a4bcd25"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnYAAABXRUJQVlA4IGoAAAAwBACdASoYABgAPu1iq1AppSOqMBgIAUAdiWcAsOwQ9aIhV87TFAE8pmAA/stXC0zem9zGWiyZu/2vsss4deMDsJJl1Y24MXDiu8MYoV7wqxRJUNIclqFEPoEcjOjHTsPVrlYtD39iZ0AA",
+        "v": "9df54f5bab"
+      }
+    }
+  },
+  "exercise/back-squat": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAABwAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCdABf1SDUghgAA/tlfM+aNjmBAHNJPra5LekfmLIB8NZCKlpGsL90919jH32roPYWHIAA=",
+        "v": "3e62796447"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAAAQBACdASoYABgAPu1qqk8ppiOmsBgIATAdiWcAvsAQ8DT/tTkmk5bwAAD+y7JQoyTUEnA/1P2AvbI+XFdWMkJ0IxlS6urm1qAg3w8RtbNKvQxc2opiX8/jqVIwfPURKxWSE7xlwAAAAA==",
+        "v": "7a7ddf3031"
+      }
+    }
+  },
+  "exercise/barbell-curl": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAADwAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCdACHpTSS22dRMHsj4AP7Y6jNiarWOI+n/HGbHk2LTsSMabNe0XgAAAA==",
+        "v": "84e1fd6fbd"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAACQBACdASoYABgAPu1iq1ApqiOisBgIAUAdiWcAzcA37x+MqIAhNAR+FvVEyQAA/u5Uffc+9QRD3IxR/IaA5pR7OBDHxgIaP6UfuBdpuZ0hzj4KdMLmkC0I4tprxB84aAAAAA==",
+        "v": "dfe262b7bc"
+      }
+    }
+  },
+  "exercise/barbell-row": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAAAwBACdASoYAAsAPu1iqk2ppaQiMAgBMB2JZwC06CIe3gmkeoDZckmIJoAA/uL/eWlQHYn/Cb1MCbp+JyAfpC5nv4hTf1G6DbvzRdWHoAA=",
+        "v": "d99e53a49b"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAADQBACdASoYABgAPu1mq08ppa2pqA1RsB2JZwC90BEDI9+1aVZCY60qWV8ikntCQAD+y+qdL5SBECq7/5FDC5Z5bS3YRVXYs19Ceud3W6JHFbjKMsmIrLtqR3MPjzyTewX2Khh3AAA=",
+        "v": "e8d400762a"
+      }
+    }
+  },
+  "exercise/bench-press": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAACwAwCdASoYAAsAPu1kqU2ppaQiMAgBMB2JZwCw7CFTkOQWiodZAAD+2VNgH3cYg8kIzywNbImd+8pWc9JugD0Y8LyvPpVIPtqJxy5Yj5s3YtD2oNPWAA==",
+        "v": "902c64d1d9"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnYAAABXRUJQVlA4IGoAAACQBACdASoYABgAPu1kqU2ppaOiMAgBMB2JZwC9WCFUBBi49pQXBV+QYKEs+6AA/rm14+JdIPPyHXRRtLvqgpEOcod4/RmR29dydRiv0lRvp2b+V7MK+M+Byl2C1s3FctYUTeLqhMHDx2AA",
+        "v": "fbe4107984"
+      }
+    }
+  },
+  "exercise/bulgarian-split-squat": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAADQAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCsACHe+xlp4o8iOsAA/suG4v5MRpuLkxIIwBW9uJCR9Yw6meo7lM1XRQJmsCxiqAAA",
+        "v": "5133b7f9f3"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAAAQBACdASoYABgAPuFeqU2opSQpMAwBIBwJZwC7ABuOQBBQvYIv+RNQAAD+23k592KTe20OTxn06lXBdfHK4BDVzPCKsXjPLYHTRW7BNRq7E3TBxlclZYJdcCcOZn5gY+zToAAA",
+        "v": "72858e2e68"
+      }
+    }
+  },
+  "exercise/cable-curl": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAADwAwCdASoYAAsAPu1kqk4ppaQiMAgBMB2JZwC7ACG6YghP9CJPljQAAP7la0Rn5wAkc6s4vwmIMuD6T6xtaPlPiJ1t2rta9HCk5rEUhA6BQIAA",
+        "v": "c4bea2ad50"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAAAwBACdASoYABgAPu1kqU2ppaOiMAgBMB2JZwC4MBnSdqndvFSuTgMYryAA/t1+Q7Mf3uiP9ylI8mZInPODoLaRySbRAqv0f20vD70A6HMQtZgIHYKbIIWVmpHrUlTrJb6wWSlroJ9n+1yt1W31qbbxQAA=",
+        "v": "89388df330"
+      }
+    }
+  },
+  "exercise/cable-fly": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAADQAwCdASoYAAsAPu1iqk2ppaQiMAgBMB2JZwCo9B8nhwLICaqve4AA/t0REm5ZOEM8VmLqZal3O7Y5Uz/x1NUagSMKh/raUbWSFYGRsPPLNuAA",
+        "v": "c7b5c130e3"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRoYAAABXRUJQVlA4IHoAAACwBACdASoYABgAPu1wsVIppiSiqAgBMB2JZwDDNBGvW8mItBulKccWf9m+ey1AAP7MP5aCv1UcOypR10aPVobKZRoNjf3oVB/9XPkCz+U+KPtwdnuU9sOYUp/C0tlvh89Dy7TdZOL/MD40/4FoFA8C2Cu1Gb9ynYWOAA==",
+        "v": "5a6335336e"
+      }
+    }
+  },
+  "exercise/cable-lateral-raise": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAABwAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCo9C0H5U/DH6AA/u1naG1pcRScTPV/fKEk/lropnz/+57i6qZVz4I+J71lE6k0AAAA",
+        "v": "10bbdbe611"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAACwBACdASoYABgAPu1sqk8ppiOiMBgIATAdiWcAzBwQtlVarqeXV301DbQhxvVAAP7L6qP7gSBet2EJdofWSE7KrkeE1DXbeHFf3lSMzu/frv6ITLsRMB0WVRsuHYKwBMepAAAA",
+        "v": "81f5f6f9ec"
+      }
+    }
+  },
+  "exercise/chest-supported-row": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAAAQBACdASoYAAsAPu1iqU2ppaQiMAgBMB2JZwCw7B8nH6RB/KX/O4EeIAD+6PDhx6AaLd6V58J1Jt9igmObYj8fhwnnTQripoM/ESc5hok+oYAA",
+        "v": "b784070f40"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAACQBACdASoYABgAPu1mq0+ppSOiMBgIATAdiWcAt7gN16WNnEQGNke+S5A/g8AA/tlfKkocM6/dU1Rd+tORI98F4AmiO/n56yiaU9D83f7zsjxZf2WPlEu7SGx/Nwj6AMFTaSRVlSjddeHPQk0xkStEAAA=",
+        "v": "82ce0fde0e"
+      }
+    }
+  },
+  "exercise/chin-up": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAAAwAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCo9CzcFUgAAP7sMZhsm91IYt1Q5XU2G57C/LswzK7LNJK3PpQRKAXmmwAA",
+        "v": "476fe7b3be"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAAAQBACdASoYABgAPu1ep06ppKMiMBgMATAdiWcRQAQPMH+xQW+l4EL4AAD+7WYa/KcP5LkXMTY+vH9inNkixUx9Mp7RfB3JXKmZPCg36IWNFVrDcKRxZaxIaCw9GJBt2Di2LrT+AAA=",
+        "v": "5bef6b8818"
+      }
+    }
+  },
+  "exercise/close-grip-bench": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAADQAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCdACHgDGqSG4R3EgAA/tjuaU3p2/mlrDj9K73j6lIaRq8Z3chKGpGs+fmw9naEaZuakAA=",
+        "v": "8a1607afbb"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnoAAABXRUJQVlA4IG4AAACQBACdASoYABgAPu1orE8ppiQiMBgIATAdiWcAygARAT0+ymxXWj1byS/X4AAA/stUU0R4BgoUwCQf86alF12zKCP//6DWgr5HMqbBnMoF0vqLuEzbd02ztOfeWP74dFFn5YdqwU61m873DiAAAA==",
+        "v": "1ac4217722"
+      }
+    }
+  },
+  "exercise/db-bench-press": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAADwAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwC06CHfuUCAwFZKR+g8AP7Y8fBRjGQ8/3Q8REyCotxXBI/aFzNqWJnhpPU5edxwCNkNXgAAAA==",
+        "v": "3df70545dd"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAABQBACdASoYABgAPu1gqE2ppSOiMAgBMB2JZwC2yB4/UbmEoLCeZgQsTPAAAP7aKP1lXupPNYUdBu5cKR4xOYt9MndB5bxxEVx/SrBDEyXxHf+zkCdXsh43MjaVKmr6ExwUhHAA",
+        "v": "d38cc79cd3"
+      }
+    }
+  },
+  "exercise/db-lateral-raise": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAACwAwCdASoYAAsAPu1iqk2ppaQiMAgBMB2JZwCw7CG7omz38h3wAAD+2OkKCHesAvQZCZYK+SQCqwM8XSUgatMEwIAAAA==",
+        "v": "982607b896"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwBACdASoYABgAPu1kqU2ppayiMBgMAZAdiWcAzcAPSFTXxdTfj4UuY0AA/uTZgYgK5qWMxo71zY7mitOjue3b304gd3+mfFkr0OJxh7VoKqv1itwAAA==",
+        "v": "e94a65419d"
+      }
+    }
+  },
+  "exercise/dips": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAAAwAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCo9C0HxK4AAP7sg36r0MFv0H/VcE2X41Lb/9r/wiDqD+YpGMqOIcZsarAA",
+        "v": "e8fd088ac0"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAACwBACdASoYABgAPu1mqk2ppaQiMAgBMB2JZwC06CFsifxoePNssa7Z+5YPEzAAAP7ZTgh1Jv5PQ0UOxUZNUx5uxm7Fc8jkqdqOpFETIDpwM881sDEXiM5TZ2PZA8AA",
+        "v": "83716caf53"
+      }
+    }
+  },
+  "exercise/face-pull": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAADQAwCdASoYAAsAPu1kqk2ppaQiMAgBMB2JZwC06CHfg8GT+8Pv7gAA/ujbsfEDijNQLfMINud/CH434EzA07QFEGsx3qbmzo8nLOE+zAA=",
+        "v": "9b9e9a33d9"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAACwBACdASoYABgAPu1urVGppqQiqAqpMB2JZwDH5A9nrTLxt5Greq9fdlO5NM0gAP7pkJJ1ZBtq6xwdBtpKtA7fqiAnQzo7icoMhipRlTEAr84q9fiXE7ki44AXLcZK++99tDuKPRxybfllrWFX7eJAMAA=",
+        "v": "cf9cc733bd"
+      }
+    }
+  },
+  "exercise/hack-squat": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAADQAwCdASoYAAsAPu1iqk2ppaQiMAgBMB2JZwAAV9LAZUPfm94lnAAA/uNPvh/SUJDhc12Se36AxaBdgkBhO5/pueDxUAU6m9leGQqhY+z+0grzaVonSlK+YAA=",
+        "v": "5cd856e63e"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnoAAABXRUJQVlA4IG4AAACwBACdASoYABgAPuFeqE2opSQpMAwBIBwJZwCw7CHf4AoQALToMejy53FNH/oAAP7jDEsZtfntjcpo2zggjQ/zouXkkwi+IdhnoY7stuSewIMZ0SiZQX+hHGt8C/TbuzDQQMpZJAROIvu4iFYAAA==",
+        "v": "81ead01ce8"
+      }
+    }
+  },
+  "exercise/hammer-curl": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAADQAwCdASoYAAsAPu1iqU2ppaQiMAgBMB2JZwCsACIASAP3RmOdQAAA/tkT+L9hCgoYrDvgbRmeE+7yaKtU4kpSXHxXss/gAAA=",
+        "v": "69c7798503"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAABQBACdASoYABgAPu1or1CppaQqqAqpUB2JZwDH5A9o8KB8I1EqrASTi94AAP7dHKTTQLf6mYLfFdT9Mos/zSvHsRwm030ZoPL9NimuwI5dRgoYCDbSXgJr2AgAAA==",
+        "v": "d0e0649b62"
+      }
+    }
+  },
+  "exercise/hip-thrust": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAAAQBACdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCw7CIaUMl8TMw4pt6ogAD+2VED6lSStGXDX2IcNHuEtpIK6UdCFLR4e1rXw2MhyN1wS8h6TuI7YowE4AAA",
+        "v": "62e1145a9b"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAACwBACdASoYABgAPu1mq0+ppSOiMBgIATAdiWcAuwAQ8APXAoyZrumPGnzbiCHgAP7LMIFSqd13kO2MfpOpEW6RT9TE+bFsRfdMF2RiUwFTG9RKswfdEqeWoSS5eR6CX2zKab0KdqhAAA==",
+        "v": "69db31c0a6"
+      }
+    }
+  },
+  "exercise/incline-bb-press": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADwAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCdACHfZ8k+cV+F33YAAP7ZPpA0Jnl/pNzD2DpFb5o4R9IgfkMdebWzYi98DgUOl3lCDVcAFc5AAAA=",
+        "v": "ce17465eb8"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAABwBACdASoYABgAPu1kqU2ppaOpMAgBMB2JZwDGQBuliIZMR0XKoZtBAC4LfAD+y/8cvTAnwxkr9jbjdTLu3t1YedkY8McG3fHe4e5mkwGHFH1CN7Zu/OdBXzi0eDfoYaNRj1SYvNgAAA==",
+        "v": "44d911c9aa"
+      }
+    }
+  },
+  "exercise/incline-db-curl": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAQBACdASoYAAsAPu1iqU2ppaQiMAgBMB2JZwCdACKm8dijKXHBfx9LgAD+2T+7CbWv6zAOUumwEPLTM8uDIfBCAhmaavrHvvPi8ATJ4bPO7I0XXigAAA==",
+        "v": "a0075e0742"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAABQBACdASoYABgAPu1kqU2ppaQsMAgBgB2JZwC4MCHe3Swvu0AW7SeK1sIAAP7LM13yOWdQGlwsQ84N87PaW3XaDcHIaTMgLnQ95yKkWONWIO+ih92ikBQJzDtZW6dCEBAAAA==",
+        "v": "b7790ecd27"
+      }
+    }
+  },
+  "exercise/incline-db-press": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlYAAABXRUJQVlA4IEoAAADwAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCw7CG8iQd4c1RxItkAAP7Y7A6ckOs1xs6EtxJiJwC4BnHYcczZ/m0rK4ocqwAAAA==",
+        "v": "181a57cbc3"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAACQAwCdASoYABgAPu1kqU2ppaOiMAgBMB2JZwDCgC0vn8XHKPtgAP7uH4Pat4yjWk/baBOwBFLN+7yRGkxGCEaSzoXi0nLO057n6ZmeQDj9FGezejxK0z/N7ADIAbOlmnu8AAAA",
+        "v": "166ab5a42c"
+      }
+    }
+  },
+  "exercise/lat-pulldown": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAAAQBACdASoYAAsAPu1kq04ppaQiMAgBMB2JZwC06CIGsxbhkdkf5by2AAD+2RTzNRWPfW7k0Kgr8NMqldItgnGZGQHmN9MFn19xwQ19nOeaifsNeAA=",
+        "v": "b4332f1859"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAADQBACdASoYABgAPu1qq08ppiOiMBgIATAdiWcAy6QPqZ+LtJWb+sHyMin3ew0+AAD+2qbq3JrdwRhrRP1VnrQPEyZna1U97qcmhadIRWW8Ao/M+xF+eeIdcfwfpBXvC+vl5Z3apY6Nph1uIKZDAAAA",
+        "v": "2d9a3e336c"
+      }
+    }
+  },
+  "exercise/leg-extension": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAADQAwCdASoYAAsAPu1kqk4ppaQiMAgBMB2JZQCdAB4S3myPEiZ3wAAA/tlc0y/bj0tYN+dArdANaUGc6K6C3kfPVsXqOYeGXSKAsytoxKYIxFG420XhVAAA",
+        "v": "41f8316469"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRpIAAABXRUJQVlA4IIYAAAAwBQCdASoYABgAPu1krVAppSQisBgIATAdiWcAxNg0cMBbXh4CuQ4HT3t490deAsH4AAD+6+s3bqfSwExXvm516Eqf4kYK1QHsMcDfORyun8KKjhGWeCDaAME99ksQgM8K1JYCMlQg1JrwH44rveh5sxBxRCy9CEZVPcmICqsqDodOsgMAAA==",
+        "v": "947b920d21"
+      }
+    }
+  },
+  "exercise/leg-press": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAADwAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwC2yCK552f7DV7vVYAAAP7jRMOg/dnjiqFeJ8w3mFqDPRuTu/mO+gG0VFw1hWo8TxHox4ibGYQiXDQRrSgA",
+        "v": "c7df7f46c9"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRoYAAABXRUJQVlA4IHoAAACwBACdASoYABgAPu1kp02ppaOiMAgBMB2JZwC4qCHfUXMJ/CpH1791uuJ2H+1AAP7i5y4J7PIYmXBl74CIrrxvLftUHfj3zxQJpSwCOliH2JxP7gPx0auM7/NkuY8EdOGjX1U9t2XmVWlM4amxac+abQOxJtRVIjAAAA==",
+        "v": "5197da5cfc"
+      }
+    }
+  },
+  "exercise/lying-leg-curl": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAADQAwCdASoYAAsAPu1iqk4ppaQiMAgBMB2JZwCw7CHgIivpHsLo8AAA/svnamUqqdLfAUuuuKKm1961JgW0pf06oCMkF1GB1h44t6zTvbSKaceerY4iJ9O2bIg8oTSdCIcbR2AA",
+        "v": "d85494bebb"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRo4AAABXRUJQVlA4IIIAAACQBACdASoYABgAPu1mrVAppSQisBgIATAdiWcAygA0b6gan4ENhmCP5Z7jwAAA/uLY2mAIBUPrQZDjz82i+AabAJwxGaRIUoP3Olc4XG9UULNqDDEte5OmCNLZsDjS9B9qFw9aaMw+b0npMyEcSS32AqO09zn62JfChCy7rPI9+bgA",
+        "v": "16ee578487"
+      }
+    }
+  },
+  "exercise/machine-chest-press": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAAAwBACdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCw7CHgLb7FOG8X1WT14AAA/uL+pT2TgdmCRPHw+sxRNzGznxqgm9vp+pK7ZLLj2VJd6YAAAA==",
+        "v": "d5e79c4034"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRoIAAABXRUJQVlA4IHYAAADQBACdASoYABgAPu1wsFKppiSiqAgBMB2JZwDE2FbexASrpjoJuoUWxCPJOQjOAAD+9XNF0+5k77iUrEK+rMJ/ZHQJAvmKCgjgSe4wpROKEQx4K81kbeTYA4e0oNio8ti9a8jvVTF45mx493jvUA5+pfeGFAAA",
+        "v": "aa4472c3be"
+      }
+    }
+  },
+  "exercise/machine-row": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAAAQBACdASoYAAsAPu1krU6ppaSiMAgBMB2JZwC2yCFsGeU1FR7vJ3vSAAD+2PgRas490AA+dQr5Fzbshu8cbKkeWIIYr6ob3MNn6LxCMyRvUJt7+WB2x2TzgAAAAA==",
+        "v": "fbe6db8a9c"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRqYAAABXRUJQVlA4IJoAAADwBACdASoYABgAPuFgqk2opaQiMAwBEBwJZQCzgB43a/MbjnKdVtTM7nKKc/xUYIAA/ulUgcOXoEDJcR2WJ/qMqBsLsks/iVnq5Hpdd11xdADH3JRA5XVd5e2FICk8ZJhY0oe7ziQyfVOl76s0SXEkUPMzCkADnHEkANgB+TH0goQMYKfNOQU1Sb8YG1aEWeR/bU8xF67ToAAA",
+        "v": "5be97269d3"
+      }
+    }
+  },
+  "exercise/machine-shoulder-press": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAADwAwCdASoYAAsAPu1mqk4ppaOiMAgBMB2JZwCdACG8ptYch6hfcPgAAP7LlNKwUOrlunlD6Y4vGBrPf82K+W5e5r+TejjhAZhDWXkYcgmQAA==",
+        "v": "37cad6a39c"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRoAAAABXRUJQVlA4IHQAAABQBACdASoYABgAPu1qq08ppiOiMBgIATAdiWcAx+QPmOVXk2JDm39L6rxgAP65/aXvreRCW9NK5DKjy/8HIj1eSn3YhyrOLYpKAdt8K1YRDkB49lPUeCm8/vfjy6bDe5U8+zsAVA7JCeisbJqdaj4cDhgAAA==",
+        "v": "c4b6cb6986"
+      }
+    }
+  },
+  "exercise/one-arm-db-row": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAADwAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCdAB0+JBxtk3YS4PEQAP7ZWFO9HlejDsrO+oi2Rhfe4qVAuL8wE2XZD9dYiyL6teljiJ4hhSAA",
+        "v": "c318b67b6f"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRpAAAABXRUJQVlA4IIQAAACwBACdASoYABgAPu1wsFIppiSiqAgBMB2JZwC06BEcjdXLWU8h2EjnMQXRv8gAAP7LNoXW7prE1P8EEi08SRTYkGjPo6W7xVZ3NjYXLl9OO0/gfF/KAaWnOoGDpdECWLTFszBQyuZWYw54f3S5ylXHpnJaBijrEu3TwYLU7+hzlFAAAAA=",
+        "v": "c733673730"
+      }
+    }
+  },
+  "exercise/overhead-cable-triceps": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAACwAwCdASoYAAsAPu1kqU2ppaQiMAgBMB2JZwCo9B6QUZ8xH3pzAAD+y/4nzkgjdmG3b5THhZ7PENT0+54sLhipESedvVgA",
+        "v": "92adee1c0c"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAADwAwCdASoYABgAPuFeqE2opSQpMAwBIBwJZwC/OC5yBGQG3Sp7ueAAAP7uhFDUgMQVap+CAj+l3GNb/zsYsKNczUsbAdfVzBANaTVZPiYRsmwEU2hg8+WgAAA=",
+        "v": "431ef220ce"
+      }
+    }
+  },
+  "exercise/pec-deck": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAADwAwCdASoYAAsAPu1iqU2ppaQiMAgBMB2JZwDE2B4ZzuwJTdKMNSAAAP7ZXs3iRhcoAReN5zAY61xWqGFIkQjhhJ4giS5jLD3GFjZ57PumjAAA",
+        "v": "5e470a7020"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRo4AAABXRUJQVlA4IIIAAADwBACdASoYABgAPu1srVCppiQiqAqpMB2JZwDE2DT4bvprQEtdquC4aVEZVOIJVgAA/vDJRDqM0ipcLC6T0op0gvXYukm7yKeiciJdHrAnJBowNTnZBEmBaOdZigCK7cA3Z+uCthuGwFhMeFHN9letNemb0AdmRY43x/JI7VrrAAAA",
+        "v": "48c33009a0"
+      }
+    }
+  },
+  "exercise/preacher-curl": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAACwAwCdASoYAAsAPu1kqU2ppaOiMAgBMB2JZwC06CG5puiDuIX78AD+2RUPrtxGVkrupDDsjs1nTqDYOPB3LiR/nO10itT0qX9s801AAAA=",
+        "v": "c9b77f59c7"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRoAAAABXRUJQVlA4IHQAAABwBACdASoYABgAPu1qrE8ppiQiMBgIATAdiWcAvVgPSnDh8MmV4DpLI0ZaAAD+6g6viboiRmflXEwlPPLjE79lt/j7JtarcF8bCPVFojoZun0Hsk5IOoCCx0bgwRQfo0okO2I8qHOf3fZFn5DhZvzhIEAAAA==",
+        "v": "35192a7c20"
+      }
+    }
+  },
+  "exercise/reverse-pec-deck": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAADQAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCdACG7wcjc8UCAboAA/tkT+C1PGpesm4P02GvN4AUxi+XQFTpDHIbznxYvRVPYSAAA",
+        "v": "dd497a2789"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAABwBACdASoYABgAPu1iq1AppSOqMBgIAUAdiWcAyrQQqsmiWJ0cALFousQaAAD+7sSVOzV6qCv+AQNCJTMyW6KIfhT32GzXLQ0bipDyLDW2Vv/JGM8I4V2NPO6gJmPz7gfOC4xTEAAAAA==",
+        "v": "f3484a94d7"
+      }
+    }
+  },
+  "exercise/romanian-deadlift": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAADwAwCdASoYAAsAPu1iqk2ppaQiMAgBMB2JZwCo9CG7x3j3DN3OKZwAAP7LlXvlokIXl4yJhXVzNqc2q58m0nddDiEvitUWAAA=",
+        "v": "4007c95384"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAAAwBACdASoYABgAPu1qqk8ppiOtMBgIAaAdiWcAuwALu+ozdyyJNxLLtjAA/rn+ebHqQnRH8Dq64iguOXIPn5HYfeDkAWMO2Gom4QA1Q4xZHar4LUlp2AVplUHugAAA",
+        "v": "e921315486"
+      }
+    }
+  },
+  "exercise/seated-bb-press": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAACQAwCdASoYAAsAPu1iqU2ppaQiMAgBMB2JZwCw7CG6OFJCeXgAAP7jFKu3WR64b2UIRpsCz4m1noIvkcQUNKI3szgAAA==",
+        "v": "b045779fb9"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAABwBACdASoYABgAPuVepE2pJSOjMAwBIByJZwDKABux+Trig9IcjUlNoOuwAAD+2V9knnrozGhPGgPVw/ei7333PvjZ46pTarlr3sOlDCairMeihVhDF9OhGUCwAA==",
+        "v": "8f8022fa1d"
+      }
+    }
+  },
+  "exercise/seated-cable-row": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAAAQBACdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwCw7CHgSyVu20jkuCsYAAD+ubmfyYxj4cWNisLKn8FDL/Qla6MqwaDr+sgBXcPEzD//vlB98Q/s5kb7wmmq2AA=",
+        "v": "1ad940bee9"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRoAAAABXRUJQVlA4IHQAAACwBACdASoYABgAPu1uq1EppiOiqAqpMB2JZwDKABEJjXuZG3VgfzoJk8cpIloAAP7LkSxvnkK/7ta7OCY4tnZOITy3WOI3laPJsSYBpsdngpaBUvjYpUhMFBxOqrxkhaBww21mtjmJabHv5xsSxotL2NgAAA==",
+        "v": "da9137924f"
+      }
+    }
+  },
+  "exercise/seated-db-press": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAACwAwCdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwC06CG7H6w4AoVggAD+4xSw82n7U6NcOdNoYgDmehntUfu+EShGPKtd4gAA",
+        "v": "d7bc3b4da3"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAADwAwCdASoYABgAPu1gp02ppaOmMAgBMB2JZwDNwB6VDxjf85XXqUHgAP7lBq00mY1Xjx+/jVyOjedltR8QNjjCeTxPg2xgLmf2ONuGsXiLH1z0/uzni8wOBAAAAA==",
+        "v": "ae6e13a741"
+      }
+    }
+  },
+  "exercise/seated-leg-curl": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAADwAwCdASoYAAsAPu1iqk2ppaQiMAgBMB2JZwC06BukVbYnBFJVOqAAAP65/uFfoBl8q70RgdY+g8na4lGahNl1vmwmF6k/iWH5sG6gWlp0TCyvlAAAAA==",
+        "v": "4522a241ff"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAABwBACdASoYABgAPuVeok2pJSMpMAwBIByJZwC7ACHfhx4am03mcSDkhd2AAAD+yy7zSUJNw2r94WBl4nxRYlp4HY5UXXvRkN7pYE94UNXUovSzi7WY45VDSDgtCIqQxkfBZPdqgAA=",
+        "v": "c3e2d37811"
+      }
+    }
+  },
+  "exercise/single-leg-extension": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADQAwCdASoYAAsAPu1iqU2ppaQiMAgBMB2JZwC06CG8L3VpKfdi6AAA/svQbOOUAt8NyqXdDUluGX3NIoW6IBzPFGQtFv65nRb1TdWKPBHSWgZsMAA=",
+        "v": "f855ebc00c"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnoAAABXRUJQVlA4IG4AAADQBACdASoYABgAPu1irVAppSQqMBgIAUAdiWcAxkAR8H2Au1w9oGlMP78X5wxQAAD+7FPFABLSSNVO/PJJK3UPCJq0IJV3BHenjOgdl22M0J+oqeOg5w6rL1rdRTv834tKgLPrxPLlBr7RXAAAAA==",
+        "v": "7ef4c8dade"
+      }
+    }
+  },
+  "exercise/smith-bench-press": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAQBACdASoYAAsAPu1iqk4ppaQiMAgBMB2JZQCo9CFr4Hy3M725wKv4AAD+40XUqr66wYFOd6uzq8oqEkTmIarp3NykR7OKA+wINKnVDxPimB4cHgAAAA==",
+        "v": "48470e9f5b"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnYAAABXRUJQVlA4IGoAAACwBACdASoYABgAPuFepk2opSOiMAwBEBwJZwC84ywBiPhPvH3obpKtRVsDDwCAAP7anVNDe7+YbW+Vn6h+AGYFsRqlZUK42EwXPxLQ/kfXjHV1zvX4KHUop6mh4PVnvMMlf8/WuWdIAAAA",
+        "v": "22ba325012"
+      }
+    }
+  },
+  "exercise/smith-incline-press": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAAAQBACdASoYAAsAPu1iqU2ppaOiMAgBMB2JZwC7ACIe16fUmI0wXQVjAAD+4zXVvS0H5P6gKNcHrRPkQr7w79kkZ7fxw/UBAAlHoQOwAAA=",
+        "v": "f100130b34"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAABwBACdASoYABgAPuVepk2pJSOiMAwBIByJZwDA3CHf6WSl+xipS17kaoPkAAD+2VCeTAKreb9Em9MT/j1k1zl7zlhV363oeyYLaEFzTVTqx0raNlERRMrI5KD7oyWeQcYAAA==",
+        "v": "dd907d8f75"
+      }
+    }
+  },
+  "exercise/straight-arm-pulldown": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAABQAwCdASoYAAsAPu1iqk2ppaQiMAgBMB2JZwAAQIyJbppCAAD+40nvoP3zPIWWTq2iOmxUFqYbQfbMj3q6M16y8DcmU3czCg+vkH9HAAA=",
+        "v": "a4af7c1472"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAABwBACdASoYABgAPulaqE2pNyQiN/VYAuAdCWcAzjhMXm/bbLVJz+Y4aUlXAAD+71/pvsi8U8h42pZXv96YFUlZNEbC5O4wKAR1adhJDEMzGt91i0eEJg55iqwQXm/AAAA=",
+        "v": "c355075945"
+      }
+    }
+  },
+  "exercise/triceps-pushdown": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlYAAABXRUJQVlA4IEoAAAAQAwCdASoYAAsAPu1mq04ppaQiMAgBMB2JZwAAelcyUAAA/uyJP21QikA/Ohq9he+OLyyUomabxqAyE9sNteKq1BjmGQi7OIyAAA==",
+        "v": "c6cb2c32c6"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAADQBACdASoYABgAPu1mrE6ppaQiKA1RMB2JZwDNwEXh3L68V10W/21IeXkirdbPUAD+8qjMfSlbrdL/GYdM/71YSrbcKtK1988DKVIVruo2y4UxDpzCZ4oxKdbqXeD1OEnWAXwYAAAAAA==",
+        "v": "08a235fe08"
+      }
+    }
+  },
+  "exercise/walking-lunge": {
+    "crops": {
+      "wide": {
+        "aspect": 2.1,
+        "widths": [
+          430,
+          860,
+          1290
+        ],
+        "blur": "data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADwAwCdASoYAAsAPu1iqk4ppaQiMAgBMB2JZwC7ACHfhO9NkSAJ7UAAAP7jEz8HlUZ4+ND0jpkPSQ4+c4cZ/0+27a6NxAAA",
+        "v": "5fc81342b5"
+      },
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAACwAwCdASoYABgAPuFap02opSOiMAwBEBwJZwDE2B5AkaD4lkj/4AD+7I59eMWdhV0ZDGUMfdfVl8E0C5iZqbWOHpyLLdUM0/g0qHtlVmUivWFAoo+/75y/vX3fKLNvRMvAAA==",
+        "v": "f702a2f70a"
+      }
+    }
+  },
+  "rehab-exercise/ankle-rom": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRp4AAABXRUJQVlA4IJIAAACwBACdASoYABgAPu1urVIppiQiqAgBMB2JZwAAJ2ags//8syGcbOozEK6O/LQAAP6EiBtH4f2LFHOtg0Uno/jI0Fg6xc7HO7G2MS866svuvqX3e3wmm+yv7XfD/W9VJCew1DDCMvOBr0SRD/jAjbTWAtDXLgzjTIhdt/4GDKwdu8IGd3UaZzB0QvbwS200X0AAAA==",
+        "v": "a474bc02f6"
+      }
+    }
+  },
+  "rehab-exercise/band-pull-apart": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRoQAAABXRUJQVlA4IHgAAAAQBQCdASoYABgAPu1kpU4ppaMiMBgMATAdiWcAACfWNhKp+Li7EyyVotqH9DGywAjAALwn+OYxR5pgPfrtpuRLy5hDhtnOAt1iSDa/V2nRANZF4Klcej7w3UyzjP1o7Tt+LIqOkNnK9vLzrxrCrAQwDqMQ3gAAAAA=",
+        "v": "71728e7bff"
+      }
+    }
+  },
+  "rehab-exercise/bilateral-raise": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRpoAAABXRUJQVlA4II4AAADQBACdASoYABgAPu1qrlCppaQiqAqpMB2JZQDJEAyONnWNDf+nvReLpK/M9V43gAD+RksjUER1YVxK1ZJtcd4S6Ea55s2bU8ox91k1aPJXPulTOV79Z/yxKT43y377VeAjNcgen6m7S0O4KnTIyHdiwj7pK0zKotWKerydCs9b1TlSPY/iPIaEc0CbceAA",
+        "v": "9dc7997d7e"
+      }
+    }
+  },
+  "rehab-exercise/bilateral-step": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnYAAABXRUJQVlA4IGoAAACQBACdASoYABgAPu1wr1IppiQiqAgBMB2JaQAAH4PfQ27XjxHaR9WwVO4m5AAA2qvg/7rDLuqi5y34GM9dQJA4fwRW/RgxQpckVLmdDX9MejIi686fcvytCefE5RnOrZ8ZVCYIozjgyxgA",
+        "v": "0352348667"
+      }
+    }
+  },
+  "rehab-exercise/calf-stretch-bent": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAACwBACdASoYABgAPu1wsFKppiSiqAgBMB2JYwDFyAy9Ha4yvDn92waoYpRzqgwAAPu7hVCT63ouNLnet4jUTZp7PwYvhG7Skn25ONZ36FvS7+60qQ0h57qQtHfKlk3XIsDrDR6M7DM3hxnk4r5C+Hq2XzasK8pBiDvrBwnrjSw4kF7NgiEWpbonmk4uLsicAAA=",
+        "v": "cae7d50ac5"
+      }
+    }
+  },
+  "rehab-exercise/copenhagen-short": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAACQBACdASoYABgAPulcp02pJSOiN/VYASAdCWkAABaTsAsBBOd678dP+64kE3AA5jGozVmbXU/3SaEMnSCIQMmFMunWc8dN8BSRIdzXSdxwYXQxUUysbeFyiMe+Xnzb7XiHDK4EpkHk0ed1Px75UAwPaqmzqIhrFRA2ed/tlCAAAA==",
+        "v": "ac6ae18b05"
+      }
+    }
+  },
+  "rehab-exercise/eccentric-step": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRpQAAABXRUJQVlA4IIgAAADQBACdASoYABgAPu1sqlEppaOiqAqpMB2JZwAALHGkWNDgLxU1/Kg7PB3AhZjiQADIpMg7rCviYiqLXjZ/iNuNO9cz6uTwLQ5foqzCVIangqQ62P8Q4CEPD69niILl9p4RhduCq2l2og2QWiHKgWIvbFIh67ZPaVoVNgve5MgaSD28R6+pd0IA",
+        "v": "ac188bbaae"
+      }
+    }
+  },
+  "rehab-exercise/glute-bridge-single": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRpQAAABXRUJQVlA4IIgAAABwBACdASoYABgAPuFapk2opSOiN/qoARAcCWcAAN9PHIl2hYaHKD68OV4QAAD9G9tB96DtGi/vlPtDzEC4zJ2DeLHRUbyuquQ2uQqIzdkEz5WPV4PLf3sklaLZvNm9OxYzKp69wr63mcwilmdwVVbgDjGWh77cpYAuTHHyZDrzOGhxu5aVVwAA",
+        "v": "4345fcaaee"
+      }
+    }
+  },
+  "rehab-exercise/hamstring-floss": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRqQAAABXRUJQVlA4IJgAAAAwBQCdASoYABgAPu1sq1EppaOiqAqpMB2JZwAAImFU3lksGZxPCiDpfNngNWhwNQEXTAD9lPqFT2kjLnOQjd9ZHrd8+joWZ28afYghaxhmMumBM7fQcXfGBlkgqfQ64wBITEvAoLzYg3Z4+NAtkX73AftiKcYo0jqtnuRuqrdGtglEMv2Xa26FWKExXuMEIfLsJuU0qZRgAA==",
+        "v": "1ef02ff72f"
+      }
+    }
+  },
+  "rehab-exercise/hip-flexor": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAACQBACdASoYABgAPu1qr1AppaQiqAqpMB2JZwDO7AoIhDIIjYAljYNjy7eIj0AA+dhR9HdHzngqTf6nXCChRzGkhBtERKbU35AtJSlh/nozXmwtctddOpryUEVdu1T88JnO8e5CHYj0b0GnMzgn4CIT6Wym7jVzVd0wjo1CTIAAAA==",
+        "v": "4bd5b64a73"
+      }
+    }
+  },
+  "rehab-exercise/iso-seated": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRrgAAABXRUJQVlA4IKwAAACwBQCdASoYABgAPu1sq1EppaOiqAqpMB2JZwDLpy5DoAW/71Bbwt1blPQZ688XbyxB3Zn6SAAA/oFHt61rPUoY9RO+F8SRHXhw+FsNaEd7w7+j4cXd/v9/kLWahp71QEL8aaA3J6AB2w01JsB1ryzrJuIEqU3jZBBa7VOMeEFg0KWhJfWKaVfy2jKinSAQ+zsIFWU/dSknw/c5ykE8MibV36e2Fx85Xgp5GAAA",
+        "v": "e0db18ecc5"
+      }
+    }
+  },
+  "rehab-exercise/iso-standing": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRoYAAABXRUJQVlA4IHoAAADQBACdASoYABgAPu1qrVEppaQiqAqpMB2JZQDG9At0H1yfHu6x7s/ejEyrkHv0AADbh5hl23CS/OaBG1Bj4Kje/CRNE5eDh1+ChqpU7ZESYFFoQS8Pu8QrK47VZMNDvbdZVTczuBc5M0jVStIXCOyM1YJfRSPRiAAAAA==",
+        "v": "cc790bd0f0"
+      }
+    }
+  },
+  "rehab-exercise/knee-to-wall": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRpYAAABXRUJQVlA4IIoAAADwBACdASoYABgAPu1mqk+ppaOiMBgIATAdiWcAACXV8rc/4OspXQa6iXWOPgiLIgAA+eMvyaETgktYvHJ48Ri4gBPRRaJQZ8qp0Gyf2RG+gAcqb0NM3qVLjRNypSH0cPsLdXjKDiCRfvZRPNuXI1lUNi0HZSYepxZf8fSs/mVs2iRsCELD3oTgAAA=",
+        "v": "0f3d238415"
+      }
+    }
+  },
+  "rehab-exercise/pogo": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAAAwBACdASoYABgAPu1oqk8ppiOiMBgIATAdiWkAABFNZ8DbZhxyLN7mAAAA7T+nlMBOM4WktLhfHx/MNHLSp7XUPHePziZk5SkrdM/NQvdC1kCP+cAjS9uQ10wNwZBE0DwQhAAA",
+        "v": "b96ad1111c"
+      }
+    }
+  },
+  "rehab-exercise/pogo-single": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAAAQBACdASoYABgAPuVgpU2pJaOiMAwBIByJZwAAOOWMU575hZTqm53EgAD52Fsjjpv9G95mGTKcfBIoVV9ttbstmsNLOJcoitL/Kp/qBWV5wJTdVnXL3QTbzwmyRJJfZW1my7goTKgAAA==",
+        "v": "20c2f1c93f"
+      }
+    }
+  },
+  "rehab-exercise/rope": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAAAwBACdASoYABgAPu1qrVCppaQjqAqpMB2JZwDGBAxQv6Je8usOTTr3AQAA9k3+JyGy9L/AB7P/93dOA5yvLrevReJKEnhQaQOwxapGKxvYkPMi5UUe1thCGs5iLdGebK8zeeDliCl6xBSMZiHeCLiq466TfcU4tKWLEqIxLIAAAA==",
+        "v": "55928a7492"
+      }
+    }
+  },
+  "rehab-exercise/seated-calf": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRroAAABXRUJQVlA4IK4AAABwBQCdASoYABgAPu1ur1KppiQiqAgBMB2JZwDO7Y0Ca8BXYEzMbLp66aDivG1/GfV0MJ/wAP1nrvEpXSVRaKFh+3Cr2r0p1zDH9v7YVbxNNT2JxjO8/uuHRff7fN/Eo+0YASGNHipMgSbR6jhkoQJWwVPvzQZ8AqXk/LI8kfmEMvikDmSaBtHNhuQPdhoPE8/U6PPYeIvyvBOBvS49osK2B6SzJUaRnv6b76SbAAA=",
+        "v": "5ca4016034"
+      }
+    }
+  },
+  "rehab-exercise/seated-raise": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRp4AAABXRUJQVlA4IJIAAACwBACdASoYABgAPu1qq1EppaOiqAqpMB2JZQAAID1V+MP4svmSiCcNFe2iiOgAAPcqqo2qY/RiSjQsz8aFBSN0fGFEh26SLZ9Go7s9BuTqm09TfRDE5H3/dHk699icwby03oLwXz3kb513csM5XGE7emxrFo+1RSt3lRrxKURVUp9/XnyBu4SiuKbmyv+f6kAAAA==",
+        "v": "7266179f3f"
+      }
+    }
+  },
+  "rehab-exercise/side-plank": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRogAAABXRUJQVlA4IHwAAACwBACdASoYABgAPt1apE2opSOiN/qoARAbiWcAACTPdgwmCTzl2eP504GayECgAOcRNnmHP14q3rKyuCHm1waPEa3jtNv2l04szHJglO79wbUpYhynWozf2mKRLa0g//T2xbeF61ycCVxCUsNFul5O4mNbSkjoapQUAAAA",
+        "v": "66a5405202"
+      }
+    }
+  },
+  "rehab-exercise/single-raise": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRoIAAABXRUJQVlA4IHYAAACwBACdASoYABgAPu1cqE2ppKOiN/VYATAdiWcAzFgQZ96t7IOCVA49qCSEnOLAAP0SuwvJLJgN6AYNdpxMcBcOs4YglGYQWVEoPv99EHn8gvf4Jf7nbtfRwzE1jkgU0uNMgFrMU4vjQS3SMd6oaUpQmeTIgAAA",
+        "v": "3a844e30ba"
+      }
+    }
+  },
+  "rehab-exercise/single-step": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRpoAAABXRUJQVlA4II4AAACwBACdASoYABgAPu1ur1IppiQiqAgBMB2JZwAALoqZc6z6z5KwWsfNKMfGGE4AAP4RLCWMIIrkMq9MwXLym049QcIRfm3/tiPgqPwcDUECotIvkgw0QlvNcKhn89iAeBzq1xaC0u8W6DbQQJCDQG9LUp895RbNXGeN9YIMLPDj4H3W98wlMVkI+aWcfFAA",
+        "v": "8713a2c170"
+      }
+    }
+  },
+  "rehab-exercise/standing-calf": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRooAAABXRUJQVlA4IH4AAADQBACdASoYABgAPu1cqU2ppKQiN/VYATAdiWcAABGXEAkdh8t/r9zoF/XAPTsLAADo7x2lZ4Xj/SKQVTo0YxGPDiati5Gbq/sR/sBIZEd+kxdbFWVEf0tgrwenYPpZeM+FyvbgqIKXAusJ5xYBvzm/BJYqHUIec+eH235vgAA=",
+        "v": "2d46c5c665"
+      }
+    }
+  },
+  "rehab-exercise/thoracic-rotation": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAADQAwCdASoYABgAPu1kqk4ppaQiMAgBMB2JZwAAH6wf5VcQZZr0YIAAurp6S8F7/NNoVBzoDDVaI4CbbsvjlL6ybdmxa9CteofZWcb4/IJppWsdwAXvOGdEPZWg0KAA",
+        "v": "94c30984e4"
+      }
+    }
+  },
+  "rehab-exercise/tibialis-raise": {
+    "crops": {
+      "square": {
+        "aspect": 1,
+        "widths": [
+          96,
+          192
+        ],
+        "blur": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAACwBACdASoYABgAPuVepk2pJSOiN/VYASAciWcAAByTW68UKlJ7j+7/G6vEulAAAP2Gsda4NKluJT9J+A3ihSCisKSFUBSsxDCV2c6bmQVypqM7l+8/EE12ACnni3lIHgbttP/fBQAAAA==",
+        "v": "119e2cf5a8"
+      }
+    }
+  }
+}

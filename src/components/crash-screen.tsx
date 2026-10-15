@@ -30,10 +30,10 @@ export function CrashScreen({ error, reset }: { error: Error & { digest?: string
       <h1 className="text-[20px] font-semibold">Något gick fel</h1>
       <p className="text-[14px] text-ink-2">Din träningshistorik är sparad på enheten och påverkas inte.</p>
       <div className="mt-2 flex gap-2">
-        <button onClick={reset} className="h-11 rounded-full bg-ink px-6 text-[14px] font-medium text-white">
+        <button onClick={reset} className="bg-accent-grad h-11 rounded-full px-6 text-[14px] font-semibold text-on-accent">
           Försök igen
         </button>
-        <button onClick={backup} className="h-11 rounded-full bg-card-2 px-5 text-[14px] font-medium">
+        <button onClick={backup} className="h-11 rounded-full border border-line bg-card-2 px-5 text-[14px] font-medium">
           {saved ? "Backup sparad" : "Spara backup"}
         </button>
       </div>

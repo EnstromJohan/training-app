@@ -30,7 +30,7 @@ const settings: SettingsRec = {
   deloadWeeks: [],
   cardioPreferred: {},
 };
-const empty = (): Snapshot => ({ settings, sessions: [], sessionExercises: [], sets: [], cardio: [], rehab: [], calibrations: [] });
+const empty = (): Snapshot => ({ settings, sessions: [], sessionExercises: [], sets: [], cardio: [], rehab: [], calibrations: [], body: [], photos: [], mobility: [] });
 
 function addSession(s: Snapshot, id: string, date: string, startedAt: string, exerciseId: string, weight: number, reps: number[]) {
   s.sessions.push({ id, createdAt: T, updatedAt: T, date, programDayId: "cb-a", status: "completed", readiness: null, sessionRpe: 7, deload: false, startedAt, completedAt: startedAt, notes: null });

@@ -112,6 +112,38 @@ export interface SettingsRec extends BaseRecord {
   cardioPreferred: Partial<Record<CardioSlot, CardioModality>>;
 }
 
+export interface BodyMeasurementRec extends BaseRecord {
+  date: string;
+  weightKg: number | null;
+  bodyFatPct: number | null;
+  muscleMassKg: number | null;
+  waistCm: number | null;
+  chestCm: number | null;
+  armCm: number | null;
+  thighCm: number | null;
+  hipsCm: number | null;
+  notes: string | null;
+}
+
+export type PhotoPose = "front" | "side" | "back";
+
+/** Progress photo metadata. The image itself lives in IndexedDB (photo_blobs) and Supabase Storage. */
+export interface ProgressPhotoRec extends BaseRecord {
+  date: string;
+  pose: PhotoPose;
+  width: number;
+  height: number;
+  /** Path in the private `progress-photos` bucket once uploaded. */
+  storagePath: string | null;
+}
+
+export interface MobilityLogRec extends BaseRecord {
+  date: string;
+  kind: "mobility" | "prehab";
+  itemIds: string[];
+  completed: boolean;
+}
+
 export interface Tables {
   workout_sessions: WorkoutSessionRec;
   session_exercises: SessionExerciseRec;
@@ -120,6 +152,9 @@ export interface Tables {
   rehab_logs: RehabLogRec;
   calibrations: CalibrationRec;
   settings: SettingsRec;
+  body_measurements: BodyMeasurementRec;
+  progress_photos: ProgressPhotoRec;
+  mobility_logs: MobilityLogRec;
 }
 
 export type TableName = keyof Tables;
@@ -132,6 +167,9 @@ export const TABLES: TableName[] = [
   "rehab_logs",
   "calibrations",
   "settings",
+  "body_measurements",
+  "progress_photos",
+  "mobility_logs",
 ];
 
 export const SETTINGS_ID = "00000000-0000-4000-8000-000000000001";

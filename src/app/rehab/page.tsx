@@ -32,12 +32,22 @@ function useDoneToday(key: string) {
   return [done, toggle] as const;
 }
 
-function ExerciseList({ items, storeKey }: { items: RehabExercise[]; storeKey: string }) {
-  const [done, toggle] = useDoneToday(storeKey);
+function ExerciseList({ items, storeKey, kind }: { items: RehabExercise[]; storeKey: string; kind?: "mobility" | "prehab" }) {
+  const store = useStore();
+  const [sessionDone, toggleSession] = useDoneToday(storeKey);
+  // Prehab/mobility are logged permanently (they count towards the weekly mobility target);
+  // rehab is logged with pain scores instead, so its checklist only lives for the day.
+  const logged = kind ? (store.s.mobility.find((m) => m.date === today() && m.kind === kind && !m.deletedAt)?.itemIds ?? []) : null;
+  const done = logged ?? sessionDone;
+  const toggle = (id: string) => {
+    if (!kind) return toggleSession(id);
+    const next = done.includes(id) ? done.filter((x) => x !== id) : [...done, id];
+    store.logMobility(kind, next);
+  };
   return (
     <div className="mt-3 space-y-2">
       {items.map((e, i) => (
-        <button key={e.id + i} onClick={() => toggle(e.id)} className="flex w-full items-center gap-3 rounded-[16px] bg-card p-2 text-left">
+        <button key={e.id + i} onClick={() => toggle(e.id)} aria-pressed={done.includes(e.id)} className="surface flex w-full items-center gap-3 rounded-[16px] p-2 text-left">
           <span className="tabular w-5 text-center text-[13px] text-muted">{i + 1}</span>
           <Photo
             slot={IMAGES.rehabExercise(e.id)}
@@ -46,8 +56,8 @@ function ExerciseList({ items, storeKey }: { items: RehabExercise[]; storeKey: s
             alt=""
             className="size-12 shrink-0 rounded-[10px]"
             fallback={
-              <div className="h-full bg-[#e9e5df]">
-                <AnatomyFigure view="back" fills={{ calves: "var(--accent)" }} viewBox="56 270 88 130" className="h-full w-full" />
+              <div className="h-full bg-[#111]">
+                <AnatomyFigure view="back" fills={{ calves: "#ff8a3d" }} viewBox="56 270 88 130" className="h-full w-full" />
               </div>
             }
           />
@@ -113,7 +123,7 @@ export default function RehabPage() {
               className="absolute inset-0"
               fallback={
                 <div className="flex h-full justify-end bg-[#2a2725] pr-6">
-                  <AnatomyFigure view="back" dark fills={{ calves: "var(--accent)", hamstrings: "#6b5244" }} viewBox="50 200 100 200" className="h-full w-auto" />
+                  <AnatomyFigure view="back" fills={{ calves: "#ff8a3d", hamstrings: "#6b3a1c" }} viewBox="50 200 100 200" className="h-full w-auto" />
                 </div>
               }
             />
@@ -180,13 +190,13 @@ export default function RehabPage() {
       {tab === "prehab" && (
         <>
           <p className="mt-3 px-1 text-[13px] text-ink-2">Skadeförebyggande styrka 1–2 gånger i veckan, gärna efter benpassen. Inga hopp.</p>
-          <ExerciseList items={PREHAB} storeKey="prehab-done" />
+          <ExerciseList items={PREHAB} storeKey="prehab-done" kind="prehab" />
         </>
       )}
       {tab === "mobility" && (
         <>
           <p className="mt-3 px-1 text-[13px] text-ink-2">Lugn rörlighet på vilodagar eller efter cardio. Stanna inom smärtfritt omfång.</p>
-          <ExerciseList items={MOBILITY} storeKey="mobility-done" />
+          <ExerciseList items={MOBILITY} storeKey="mobility-done" kind="mobility" />
         </>
       )}
     </div>

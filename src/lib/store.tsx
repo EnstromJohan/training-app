@@ -3,12 +3,17 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { DEFAULT_EQUIPMENT, type Readiness } from "./engine/types";
 import { toIso } from "./engine/weekly/dates";
-import { exportAll, getAll, importAll, putLocal } from "./db/local";
+import { deleteBlob, exportAll, getAll, importAll, putBlob, putLocal } from "./db/local";
+import { compressPhoto } from "./photos";
 import { supabase, sync } from "./db/supabase";
 import {
   SETTINGS_ID,
   type BaseRecord,
+  type BodyMeasurementRec,
   type CalibrationRec,
+  type MobilityLogRec,
+  type PhotoPose,
+  type ProgressPhotoRec,
   type CardioSessionRec,
   type RehabLogRec,
   type SessionExerciseRec,
@@ -57,6 +62,9 @@ const KEY: Record<TableName, keyof Snapshot> = {
   rehab_logs: "rehab",
   calibrations: "calibrations",
   settings: "settings",
+  body_measurements: "body",
+  progress_photos: "photos",
+  mobility_logs: "mobility",
 };
 
 export type SyncState = "off" | "idle" | "syncing" | "error" | "signed_out";
@@ -77,6 +85,11 @@ interface Store {
   logCardio(rec: Omit<CardioSessionRec, keyof BaseRecord>): Promise<void>;
   logRehab(painDuring: number): Promise<void>;
   setMorningPain(rehabLogId: string, pain: number): Promise<void>;
+  logBody(rec: Omit<BodyMeasurementRec, keyof BaseRecord>): Promise<void>;
+  deleteBody(id: string): Promise<void>;
+  addPhoto(file: File, pose: PhotoPose, date: string): Promise<void>;
+  deletePhoto(id: string): Promise<void>;
+  logMobility(kind: MobilityLogRec["kind"], itemIds: string[]): Promise<void>;
   exportJson(): Promise<string>;
   importJson(json: string): Promise<number>;
   syncNow(): Promise<void>;
@@ -108,7 +121,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [toast]);
 
   const load = useCallback(async () => {
-    const [settings, sessions, sessionExercises, sets, cardio, rehab, calibrations] = await Promise.all([
+    const [settings, sessions, sessionExercises, sets, cardio, rehab, calibrations, body, photos, mobility] = await Promise.all([
       getAll("settings"),
       getAll("workout_sessions"),
       getAll("session_exercises"),
@@ -116,6 +129,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       getAll("cardio_sessions"),
       getAll("rehab_logs"),
       getAll("calibrations"),
+      getAll("body_measurements"),
+      getAll("progress_photos"),
+      getAll("mobility_logs"),
     ]);
     const snap: Snapshot = {
       settings: settings.find((x) => x.id === SETTINGS_ID) ?? defaultSettings(),
@@ -125,6 +141,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       cardio,
       rehab,
       calibrations,
+      body,
+      photos,
+      mobility,
     };
     ref.current = snap;
     setS(snap);
@@ -149,7 +168,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           break;
         }
         setSyncState("idle");
-        setSyncMessage(null);
+        setSyncMessage(r.warning ?? null);
         if (r.pulled) await load();
       } while (syncAgain.current);
     } catch (e) {
@@ -363,6 +382,37 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (rec) await put("rehab_logs", { ...rec, painNextMorning: pain, updatedAt: now() });
       },
 
+      async logBody(rec) {
+        // One measurement per day: logging again the same day updates that entry.
+        const existing = cur().body.find((b) => b.date === rec.date && !b.deletedAt);
+        await put("body_measurements", { ...stamp(rec, existing), deletedAt: null } as BodyMeasurementRec);
+      },
+
+      async deleteBody(id) {
+        const rec = cur().body.find((x) => x.id === id);
+        if (rec) await put("body_measurements", { ...rec, deletedAt: now(), updatedAt: now() });
+      },
+
+      async addPhoto(file, pose, date) {
+        const { blob, width, height } = await compressPhoto(file);
+        const rec = stamp({ date, pose, width, height, storagePath: null }) as ProgressPhotoRec;
+        await putBlob(rec.id, blob);
+        await put("progress_photos", rec);
+      },
+
+      async deletePhoto(id) {
+        // Photos are personal: deleting removes the image (locally now, in the cloud on next sync).
+        const rec = cur().photos.find((x) => x.id === id);
+        if (!rec) return;
+        await deleteBlob(id).catch(() => {});
+        await put("progress_photos", { ...rec, deletedAt: now(), updatedAt: now() });
+      },
+
+      async logMobility(kind, itemIds) {
+        const existing = cur().mobility.find((m) => m.date === today() && m.kind === kind && !m.deletedAt);
+        await put("mobility_logs", { ...stamp({ date: today(), kind, itemIds, completed: itemIds.length > 0 }, existing), deletedAt: null } as MobilityLogRec);
+      },
+
       async exportJson() {
         return JSON.stringify({ exportedAt: now(), version: 1, data: await exportAll() }, null, 2);
       },
@@ -389,7 +439,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           Appen sparar din träning på enheten, men webbläsaren tillåter det inte just nu. Det händer oftast i privat läge eller om webbplatsdata är blockerad.
         </p>
         <p className="text-[12px] text-muted">{fatal}</p>
-        <button onClick={() => location.reload()} className="mt-2 h-11 rounded-full bg-ink px-6 text-[14px] font-medium text-white">
+        <button onClick={() => location.reload()} className="bg-accent-grad mt-2 h-11 rounded-full px-6 text-[14px] font-semibold text-on-accent">
           Försök igen
         </button>
       </div>
@@ -406,7 +456,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     <Ctx.Provider value={store}>
       {children}
       {toast && (
-        <div role="alert" className="fixed inset-x-4 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-[60] mx-auto max-w-md rounded-[16px] bg-ink px-4 py-3 text-[13px] text-white shadow-lg">
+        <div role="alert" className="fixed inset-x-4 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-[60] mx-auto max-w-md rounded-[16px] border border-line bg-[#1c1c1c] px-4 py-3 text-[13px] text-ink shadow-lg">
           {toast}
         </div>
       )}

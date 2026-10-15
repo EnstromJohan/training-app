@@ -8,67 +8,109 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 export const cn = (...xs: ClassValue[]) => twMerge(clsx(xs));
 
+/** Dark surface card: subtle gradient, hairline border (design). */
 export function Card({ className, children, onClick }: { className?: string; children: ReactNode; onClick?: () => void }) {
   return (
-    <div onClick={onClick} className={cn("rounded-[18px] bg-card p-4", className)}>
+    <div onClick={onClick} className={cn("surface rounded-[18px] p-4", className)}>
       {children}
     </div>
   );
 }
 
+type Variant = "primary" | "secondary" | "ghost" | "outline" | "accent" | "dark" | "soft";
+
 export function Button({
-  variant = "dark",
+  variant = "primary",
   size = "md",
   className,
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "dark" | "accent" | "ghost" | "soft" | "outline"; size?: "sm" | "md" | "lg" }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: "sm" | "md" | "lg" }) {
+  const v = variant === "accent" ? "primary" : variant === "dark" || variant === "soft" ? "secondary" : variant;
   return (
     <button
       {...props}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full font-medium transition active:scale-[0.98] disabled:opacity-40",
+        "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition active:scale-[0.98] disabled:opacity-40",
         size === "sm" && "h-9 px-4 text-[13px]",
         size === "md" && "h-12 px-5 text-[15px]",
-        size === "lg" && "h-[52px] px-6 text-[16px]",
-        variant === "dark" && "bg-ink text-white",
-        variant === "accent" && "bg-accent text-ink",
-        variant === "ghost" && "bg-transparent text-ink",
-        variant === "soft" && "bg-card-2 text-ink",
-        variant === "outline" && "border border-line bg-card text-ink",
+        size === "lg" && "h-[54px] px-6 text-[16px]",
+        v === "primary" && "bg-accent-grad glow text-on-accent",
+        v === "secondary" && "border border-line bg-card-2 text-ink",
+        v === "ghost" && "bg-transparent text-ink",
+        v === "outline" && "border border-line bg-transparent text-ink",
         className,
       )}
     />
   );
 }
 
-/** Pill tabs: black active pill, soft grey inactive pills (as in the design). */
+/** Pill tabs: orange glowing active pill, dark outlined inactive pills (design). */
 export function PillTabs<T extends string>({
   value,
   options,
   onChange,
   className,
   size = "md",
+  stretch,
 }: {
   value: T;
   options: Array<{ value: T; label: string; disabled?: boolean; icon?: ReactNode }>;
   onChange: (v: T) => void;
   className?: string;
   size?: "sm" | "md";
+  stretch?: boolean;
 }) {
   return (
-    <div className={cn("no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4", className)}>
+    <div role="tablist" className={cn("no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4", className)}>
+      {options.map((o) => {
+        const on = value === o.value;
+        return (
+          <button
+            key={o.value}
+            role="tab"
+            aria-selected={on}
+            disabled={o.disabled}
+            onClick={() => onChange(o.value)}
+            className={cn(
+              "inline-flex shrink-0 items-center justify-center gap-1 rounded-full font-medium transition disabled:opacity-40",
+              size === "md" ? "h-9 px-4 text-[13px]" : "h-8 px-3 text-[12px]",
+              stretch && "flex-1",
+              on ? "bg-accent-grad glow-soft text-on-accent" : "border border-line bg-card text-ink-2",
+            )}
+          >
+            {o.icon}
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Segmented control in a dark track (4v / 8v / 12v, Vecka / Månad / År). */
+export function Segmented<T extends string>({
+  value,
+  options,
+  onChange,
+  className,
+}: {
+  value: T;
+  options: Array<{ value: T; label: string }>;
+  onChange: (v: T) => void;
+  className?: string;
+}) {
+  return (
+    <div className={cn("inline-flex rounded-full border border-line bg-card p-0.5", className)}>
       {options.map((o) => (
         <button
           key={o.value}
-          disabled={o.disabled}
           onClick={() => onChange(o.value)}
+          aria-pressed={value === o.value}
           className={cn(
-            "inline-flex shrink-0 items-center gap-1 rounded-full font-medium transition disabled:opacity-40",
-            size === "md" ? "h-[34px] px-4 text-[13px]" : "h-7 px-3 text-[12px]",
-            value === o.value ? "bg-ink text-white" : "bg-card-2 text-ink-2",
+            "h-8 flex-1 rounded-full px-3 text-[12px] font-medium transition",
+            value === o.value ? "bg-accent-grad glow-soft text-on-accent" : "text-muted",
           )}
         >
-          {o.icon}
           {o.label}
         </button>
       ))}
@@ -76,24 +118,7 @@ export function PillTabs<T extends string>({
   );
 }
 
-/** Segmented control (4v / 8v / 12v). */
-export function Segmented<T extends string>({ value, options, onChange }: { value: T; options: Array<{ value: T; label: string }>; onChange: (v: T) => void }) {
-  return (
-    <div className="inline-flex rounded-full bg-card-2 p-0.5">
-      {options.map((o) => (
-        <button
-          key={o.value}
-          onClick={() => onChange(o.value)}
-          className={cn("h-7 rounded-full px-3 text-[12px] font-medium", value === o.value ? "bg-[#d9d4cd] text-ink" : "text-muted")}
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-/** Stepper row: small label top-left, − value + (design's reps/weight rows). */
+/** Stepper row: small label top-left, − value +. */
 export function Stepper({
   label,
   value,
@@ -115,25 +140,31 @@ export function Stepper({
 }) {
   const fmt = (n: number) => n.toLocaleString("sv-SE", { maximumFractionDigits: 2, useGrouping: false });
   return (
-    <div className={cn("relative flex items-center justify-between rounded-[16px] px-2", big ? "h-[62px]" : "h-[54px]", tint ? "bg-accent-soft/70" : "bg-card")}>
+    <div
+      className={cn(
+        "relative flex items-center justify-between rounded-[16px] border px-2",
+        big ? "h-[62px]" : "h-[56px]",
+        tint ? "border-accent/40 bg-accent-soft" : "border-line bg-card-2",
+      )}
+    >
       <span className="absolute left-3 top-1.5 text-[9px] text-muted">{label}</span>
       <button
         aria-label={`Minska ${label}`}
         onClick={() => onChange(Math.max(min, Math.round((value - step) * 100) / 100))}
-        className="flex size-9 items-center justify-center rounded-full text-ink active:bg-card-2"
+        className="flex size-9 items-center justify-center rounded-full bg-card text-ink active:scale-95"
       >
-        <Minus size={18} strokeWidth={1.8} />
+        <Minus size={17} strokeWidth={2} />
       </button>
-      <span className={cn("tabular font-semibold leading-none", big ? "text-[26px]" : "text-[24px]")}>
+      <span className={cn("tabular font-bold leading-none", big ? "text-[26px]" : "text-[22px]")}>
         {fmt(value)}
-        {unit && <span className="ml-1 text-[13px] font-medium">{unit}</span>}
+        {unit && <span className="ml-1 text-[13px] font-medium text-ink-2">{unit}</span>}
       </span>
       <button
         aria-label={`Öka ${label}`}
         onClick={() => onChange(Math.round((value + step) * 100) / 100)}
-        className="flex size-9 items-center justify-center rounded-full text-ink active:bg-card-2"
+        className="flex size-9 items-center justify-center rounded-full bg-card text-ink active:scale-95"
       >
-        <Plus size={18} strokeWidth={1.8} />
+        <Plus size={17} strokeWidth={2} />
       </button>
     </div>
   );
@@ -144,11 +175,11 @@ export function Chip({ children, tone = "neutral", className }: { children: Reac
     <span
       className={cn(
         "inline-flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-medium",
-        tone === "neutral" && "bg-card-2 text-ink-2",
+        tone === "neutral" && "border border-line bg-card-2 text-ink-2",
         tone === "accent" && "bg-accent-soft text-accent-ink",
         tone === "good" && "bg-good-soft text-good-ink",
         tone === "bad" && "bg-bad-soft text-bad",
-        tone === "dark" && "bg-ink text-white",
+        tone === "dark" && "bg-ink text-bg",
         className,
       )}
     >
@@ -160,9 +191,11 @@ export function Chip({ children, tone = "neutral", className }: { children: Reac
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-[2px]" onClick={onClose}>
       <div
-        className="max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-t-[28px] bg-bg p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+        role="dialog"
+        aria-label={title}
+        className="max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-t-[28px] border-t border-line bg-[#101010] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-line" />
@@ -178,25 +211,43 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
   );
 }
 
-export function Ring({ progress, size = 120, stroke = 8, color = "var(--accent)", track = "var(--line)", children }: { progress: number; size?: number; stroke?: number; color?: string; track?: string; children?: ReactNode }) {
+export function Ring({
+  progress,
+  size = 120,
+  stroke = 8,
+  color = "var(--accent)",
+  track = "var(--card-2)",
+  glow,
+  children,
+}: {
+  progress: number;
+  size?: number;
+  stroke?: number;
+  color?: string;
+  track?: string;
+  glow?: boolean;
+  children?: ReactNode;
+}) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90">
+      <svg width={size} height={size} className="-rotate-90" style={glow ? { filter: "drop-shadow(0 0 6px rgba(255,138,61,0.65))" } : undefined}>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={track} strokeWidth={stroke} />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke={color}
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - Math.min(1, Math.max(0, progress)))}
-          style={{ transition: "stroke-dashoffset 0.4s linear" }}
-        />
+        {progress > 0 && (
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke={color}
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={c}
+            strokeDashoffset={c * (1 - Math.min(1, Math.max(0, progress)))}
+            style={{ transition: "stroke-dashoffset 0.4s linear" }}
+          />
+        )}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">{children}</div>
     </div>
@@ -213,54 +264,75 @@ export function Gauge({ value, max = 10, size = 120, children }: { value: number
     <div className="relative" style={{ width: size, height: size / 2 + stroke }}>
       <svg width={size} height={size / 2 + stroke}>
         <path d={`M${stroke / 2},${size / 2} a${r},${r} 0 0 1 ${2 * r},0`} fill="none" stroke="var(--card-2)" strokeWidth={stroke} strokeLinecap="round" />
-        {p > 0 && <path
-          d={`M${stroke / 2},${size / 2} a${r},${r} 0 0 1 ${2 * r},0`}
-          fill="none"
-          stroke="var(--good)"
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          strokeDasharray={`${half * p} ${half}`}
-        />}
+        {p > 0 && (
+          <path
+            d={`M${stroke / 2},${size / 2} a${r},${r} 0 0 1 ${2 * r},0`}
+            fill="none"
+            stroke="var(--good)"
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={`${half * p} ${half}`}
+          />
+        )}
       </svg>
       <div className="absolute inset-x-0 bottom-0 flex items-end justify-center">{children}</div>
     </div>
   );
 }
 
-/** Screen header: plain chevron back, title, optional ••• menu (design header). */
+/** Screen header: round back button, bold title, optional ••• menu. `center` = title centred (workout). */
 export function ScreenHeader({
   title,
   subtitle,
   back,
   onMenu,
-  serif,
   right,
+  center,
 }: {
   title: string;
   subtitle?: string;
   back?: boolean | (() => void);
   onMenu?: () => void;
-  serif?: boolean;
   right?: ReactNode;
+  center?: boolean;
+  serif?: boolean;
 }) {
   const router = useRouter();
+  const backBtn = back && (
+    <button
+      aria-label="Tillbaka"
+      onClick={typeof back === "function" ? back : () => router.back()}
+      className="flex size-10 shrink-0 items-center justify-center rounded-full border border-line bg-card active:scale-95"
+    >
+      <ChevronLeft size={20} strokeWidth={1.8} />
+    </button>
+  );
+  const menu = onMenu && (
+    <button aria-label="Meny" onClick={onMenu} className="flex size-10 shrink-0 items-center justify-center">
+      <MoreHorizontal size={22} />
+    </button>
+  );
+  if (center) {
+    return (
+      <header className="flex items-center gap-2 pb-3 pt-3">
+        <div className="w-10">{backBtn}</div>
+        <div className="min-w-0 flex-1 text-center">
+          <h1 className="truncate text-[19px] font-bold leading-tight">{title}</h1>
+          {subtitle && <p className="tabular text-[12px] text-muted">{subtitle}</p>}
+        </div>
+        <div className="flex w-10 justify-end">{right ?? menu}</div>
+      </header>
+    );
+  }
   return (
-    <header className="flex items-center gap-2 pb-3 pt-3">
-      {back && (
-        <button aria-label="Tillbaka" onClick={typeof back === "function" ? back : () => router.back()} className="-ml-1.5 flex size-9 items-center justify-center">
-          <ChevronLeft size={24} strokeWidth={1.8} />
-        </button>
-      )}
+    <header className="flex items-center gap-3 pb-3 pt-3">
+      {backBtn}
       <div className="min-w-0 flex-1">
-        <h1 className={cn("truncate leading-tight tracking-tight", serif ? "font-serif text-[32px]" : "text-[24px] font-semibold")}>{title}</h1>
+        <h1 className="truncate text-[26px] font-bold leading-tight tracking-tight">{title}</h1>
         {subtitle && <p className="text-[12px] text-muted">{subtitle}</p>}
       </div>
       {right}
-      {onMenu && (
-        <button aria-label="Meny" onClick={onMenu} className="flex size-9 items-center justify-center">
-          <MoreHorizontal size={22} />
-        </button>
-      )}
+      {menu}
     </header>
   );
 }
@@ -273,7 +345,7 @@ export function PageHeader({ title, back, right }: { title: string; back?: () =>
 export function SectionTitle({ children, right, className }: { children: ReactNode; right?: ReactNode; className?: string }) {
   return (
     <div className={cn("mb-2 mt-5 flex items-end justify-between", className)}>
-      <h2 className="text-[15px] font-semibold">{children}</h2>
+      <h2 className="text-[16px] font-semibold">{children}</h2>
       {right}
     </div>
   );
@@ -288,7 +360,11 @@ export function Scale({ value, onChange, max = 10, min = 0, labels }: { value: n
           <button
             key={n}
             onClick={() => onChange(n)}
-            className={cn("tabular h-10 flex-1 rounded-xl text-sm font-medium transition", value === n ? "bg-ink text-white" : "bg-card-2 text-ink-2")}
+            aria-pressed={value === n}
+            className={cn(
+              "tabular h-10 flex-1 rounded-xl text-sm font-medium transition",
+              value === n ? "bg-accent-grad text-on-accent" : "border border-line bg-card-2 text-ink-2",
+            )}
           >
             {n}
           </button>
@@ -304,23 +380,38 @@ export function Scale({ value, onChange, max = 10, min = 0, labels }: { value: n
   );
 }
 
-/** Check circle used in lists (done = green, current = dark, todo = outline). */
+/** Check circle used in lists (done = green, current = orange ring, todo = outline). */
 export function CheckDot({ state, size = 22 }: { state: "done" | "current" | "todo"; size?: number }) {
   return (
     <span
       className={cn(
         "flex shrink-0 items-center justify-center rounded-full",
-        state === "done" && "bg-good text-white",
-        state === "current" && "bg-ink text-white",
-        state === "todo" && "border-[1.5px] border-[#cfc9c1]",
+        state === "done" && "bg-good text-[#06140b]",
+        state === "current" && "border-2 border-accent text-accent shadow-[0_0_10px_rgba(255,138,61,0.6)]",
+        state === "todo" && "border-[1.5px] border-[#3a3a3a]",
       )}
       style={{ width: size, height: size }}
     >
-      {state !== "todo" && (
+      {state === "done" && (
         <svg width={size * 0.55} height={size * 0.55} viewBox="0 0 12 12" fill="none">
-          <path d="M2.5 6.2 5 8.6l4.6-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M2.5 6.2 5 8.6l4.6-5" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}
+    </span>
+  );
+}
+
+/** Round icon with hairline border (design stat chips). */
+export function IconCircle({ children, className, active }: { children: ReactNode; className?: string; active?: boolean }) {
+  return (
+    <span
+      className={cn(
+        "flex size-11 shrink-0 items-center justify-center rounded-full border",
+        active ? "border-accent/60 text-accent glow-soft" : "border-line bg-card text-ink-2",
+        className,
+      )}
+    >
+      {children}
     </span>
   );
 }

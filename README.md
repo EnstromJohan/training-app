@@ -40,7 +40,8 @@ Appen fungerar direkt utan databas. All historik sparas i webbläsarens IndexedD
 1. Starta Docker Desktop och kör `npx supabase start`.
 2. Kopiera `API URL` och `anon key` till `.env.local` (se `.env.example`).
 3. Kör `npx supabase db reset` för att applicera `supabase/migrations/`.
-4. Logga in under **Inställningar → Data** med magic link. Lokala data pushas automatiskt, och synken körs i bakgrunden efter varje ändring och när nätet kommer tillbaka.
+4. Kör även `supabase/migrations/20261015000000_body_photos_mobility.sql`. Den behövs för kroppsmått, progressionsfoton (ett privat lagringsutrymme) och rörlighetsloggar. Tills den är körd sparas den datan bara på enheten, och appen visar en varning.
+5. Logga in under **Inställningar → Data** med magic link. Lokala data pushas automatiskt, och synken körs i bakgrunden efter varje ändring och när nätet kommer tillbaka.
 
 Tabellerna har RLS per användare och ingen delete-policy. Historik kan alltså inte hårdraderas från klienten. Under Inställningar → Data finns också JSON-export och JSON-import.
 
@@ -57,6 +58,20 @@ Tabellerna har RLS per användare och ingen delete-policy. Historik kan alltså 
 | Lokal lagring, synk och store | `src/lib/db/`, `src/lib/store.tsx` |
 
 Motorerna är rena funktioner med tydliga regler. Varje rekommendation har en reason code med en förklaring på svenska som visas i appen. Historiken är källan till sanningen, och nästa pass räknas alltid fram från den.
+
+## Funktioner
+
+- **Hem:** veckans pass med ring, räknare för styrka, cardio och rörlighet, nästa pass med uppskattad längd och volym per dag.
+- **Aktivt pass:** settabell med förifyllda värden, editor för reps, vikt och RIR, vilotimer, rehab under vilan, historik, video (YouTube-sökning) och byte av övning.
+- **Cardio:** Zone 2, intervaller, backe och långpass, med timer, ljudsignaler och skärmlås.
+- **Analys:**
+  - Min utveckling.
+  - Muskelgrupper: volym mot veckomål, utveckling och symmetri.
+  - Insikter: styrka, kondition, återhämtning, sömn, belastning (ACWR) och uppskattad skaderisk.
+  - Kropp: vikt, kroppsfett, muskelmassa, mått, progressionsfoton och komposition.
+- **Rehab & Prehab:** hälsenans belastningstrappa samt förebyggande övningar och rörlighet. Rörlighet räknas mot veckomålet.
+
+Bilderna graderas automatiskt till mörkt tema i `npm run images` (se `grades` i `src/lib/images/slots.json`).
 
 ## Regler i korthet
 

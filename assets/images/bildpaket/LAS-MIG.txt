@@ -1,0 +1,7 @@
+Bildpaket: 77 JPG-bilder
+
+4 huvudbilder, 3 schemabilder, 46 styrkeövningar och 24 rehab-/rörlighetsövningar.
+Genererade med det inbyggda bildverktyget. Filnamn och bildproportioner följer underlaget.
+Originalprompter finns i bildprompter.md och förtydliganden i korrigerade-prompter.json.
+Profilbild avatar.jpg ingår inte: enligt underlaget ska den vara ditt eget foto.
+Bilderna har inte installerats eller provats i appen; appens projekt och README har inte bifogats.

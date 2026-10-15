@@ -64,12 +64,18 @@ export function AnatomyFigure({
   // Unique ids per instance: shared gradient ids break when another SVG on the page is hidden.
   const uid = useId().replace(/:/g, "");
   const parts = view === "front" ? FRONT : BACK;
-  const base = dark ? "var(--muscle-dark)" : "var(--muscle)";
-  const skin = dark ? "#36322e" : "#e4ddd4";
-  const gap = dark ? "#1a1816" : "#f2eee8";
+  // Dark theme: charcoal muscles, near-black gaps; highlighted muscles glow (design).
+  void dark;
+  const base = "var(--muscle)";
+  const skin = "#232120";
+  const gap = "#0b0b0b";
   const draw = (p: Part, i: number) => (
     <g key={i}>
-      <path d={p.d} fill={(p.m && fills[p.m]) || base} />
+      <path
+        d={p.d}
+        fill={(p.m && fills[p.m]) || base}
+        style={p.m && fills[p.m] ? { filter: `drop-shadow(0 0 3px ${fills[p.m]})` } : undefined}
+      />
       {/* Volume: light from top-left, shadow bottom-right */}
       <path d={p.d} fill={`url(#shade-${uid})`} stroke={gap} strokeWidth={1.3} strokeLinejoin="round" />
     </g>
@@ -78,12 +84,12 @@ export function AnatomyFigure({
     <svg viewBox={viewBox} className={className} role="img" aria-label={label ?? (view === "front" ? "Framsida" : "Baksida")}>
       <defs>
         <linearGradient id={`shade-${uid}`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#fff" stopOpacity={dark ? 0.16 : 0.38} />
+          <stop offset="0" stopColor="#fff" stopOpacity={0.16} />
           <stop offset="0.45" stopColor="#fff" stopOpacity="0" />
-          <stop offset="1" stopColor="#000" stopOpacity={dark ? 0.35 : 0.16} />
+          <stop offset="1" stopColor="#000" stopOpacity={0.35} />
         </linearGradient>
         <radialGradient id={`skin-${uid}`} cx="0.35" cy="0.3" r="0.8">
-          <stop offset="0" stopColor="#fff" stopOpacity={dark ? 0.08 : 0.35} />
+          <stop offset="0" stopColor="#fff" stopOpacity={0.08} />
           <stop offset="1" stopColor="#fff" stopOpacity="0" />
         </radialGradient>
       </defs>
@@ -97,8 +103,8 @@ export function AnatomyFigure({
 
 export function MuscleMap({ primary, secondary = [], dark, className }: { primary: Muscle[]; secondary?: Muscle[]; dark?: boolean; className?: string }) {
   const fills: Fills = {};
-  for (const m of secondary) fills[m] = "#f7caa8";
-  for (const m of primary) fills[m] = "var(--accent)";
+  for (const m of secondary) fills[m] = "#9a4d1e";
+  for (const m of primary) fills[m] = "#ff8a3d";
   return (
     <div className={`flex justify-center gap-4 ${className ?? ""}`}>
       <AnatomyFigure view="front" fills={fills} dark={dark} className="h-56 w-auto" />
@@ -127,9 +133,9 @@ export function SessionThumb({ category, done }: { category: SessionCategory | "
 }
 
 export const GROUP_COLORS: Record<string, string> = {
-  chest: "#ef8f6b",
-  back: "#6aa6d6",
-  shoulders: "#4fb3a9",
-  arms: "#45403b",
-  legs: "#e8737f",
+  chest: "#ff8a3d",
+  back: "#ff8a3d",
+  shoulders: "#ff8a3d",
+  arms: "#ff8a3d",
+  legs: "#ff8a3d",
 };

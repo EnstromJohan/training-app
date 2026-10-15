@@ -14,7 +14,7 @@ import { LoginForm } from "@/components/login-form";
 import { EXERCISES } from "@/lib/program/exercises";
 import { useStore, today } from "@/lib/store";
 
-type Tab = "profile" | "goals" | "equipment" | "injuries" | "other";
+type Tab = "goals" | "equipment" | "injuries" | "other";
 
 type Goal = SettingsRec["goal"];
 const GOALS: Array<{ value: Goal; label: string; icon: typeof Dumbbell }> = [
@@ -30,7 +30,7 @@ const LEVELS: Array<SettingsRec["experience"]> = ["beginner", "intermediate", "a
 export default function SettingsPage() {
   const store = useStore();
   const st = store.s.settings;
-  const [tab, setTab] = useState<Tab>("profile");
+  const [tab, setTab] = useState<Tab>("goals");
   const set = (patch: Partial<SettingsRec>) => store.updateSettings(patch);
   const setEq = (patch: Partial<EquipmentProfile>) => set({ equipment: { ...st.equipment, ...patch } });
   const env = st.equipment.environment ?? "gym";
@@ -38,12 +38,11 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <ScreenHeader title="Inställningar" />
+      <ScreenHeader title="Mål & Inställningar" back />
       <PillTabs
         value={tab}
         onChange={setTab}
         options={[
-          { value: "profile", label: "Profil" },
           { value: "goals", label: "Mål" },
           { value: "equipment", label: "Utrustning" },
           { value: "injuries", label: "Skador" },
@@ -51,23 +50,27 @@ export default function SettingsPage() {
         ]}
       />
 
-      {tab === "profile" && (
+      {tab === "goals" && (
         <>
           <SectionTitle>Dina mål</SectionTitle>
           <div className="grid grid-cols-3 gap-2">
-            {GOALS.map(({ value, label, icon: Icon }) => (
-              <button
-                key={value}
-                onClick={() => set({ goal: value })}
-                className={cn(
-                  "flex h-[76px] flex-col items-center justify-center gap-1.5 rounded-[16px] text-[11px] font-medium",
-                  st.goal === value ? "bg-accent-soft text-accent-ink" : "bg-card text-ink-2",
-                )}
-              >
-                <Icon size={22} strokeWidth={1.5} />
-                {label}
-              </button>
-            ))}
+            {GOALS.map(({ value, label, icon: Icon }) => {
+              const on = st.goal === value;
+              return (
+                <button
+                  key={value}
+                  aria-pressed={on}
+                  onClick={() => set({ goal: value })}
+                  className={cn(
+                    "flex h-[82px] flex-col items-center justify-center gap-1.5 rounded-[16px] border text-[11px] font-medium transition active:scale-[0.98]",
+                    on ? "glow-soft border-accent bg-accent-soft text-accent-ink" : "surface text-ink-2",
+                  )}
+                >
+                  <Icon size={24} strokeWidth={1.5} className={on ? "text-accent" : "text-ink-2"} />
+                  {label}
+                </button>
+              );
+            })}
           </div>
 
           <SectionTitle>Nuvarande nivå</SectionTitle>
@@ -80,11 +83,14 @@ export default function SettingsPage() {
               value={LEVELS.indexOf(st.experience)}
               onChange={(e) => set({ experience: LEVELS[Number(e.target.value)] })}
               className="level-slider w-full"
+              style={{ ["--p" as string]: `${(LEVELS.indexOf(st.experience) / 2) * 100}%` }}
               aria-label="Nuvarande nivå"
             />
-            <div className="mt-1 flex justify-between text-[12px]">
+            <div className="mt-1.5 flex justify-between text-[12px]">
               {["Nybörjare", "Medel", "Avancerad"].map((l, i) => (
-                <span key={l} className={LEVELS.indexOf(st.experience) === i ? "font-semibold" : "text-muted"}>{l}</span>
+                <span key={l} className={LEVELS.indexOf(st.experience) === i ? "font-semibold text-ink" : "text-muted"}>
+                  {l}
+                </span>
               ))}
             </div>
           </div>
@@ -98,61 +104,43 @@ export default function SettingsPage() {
                 ["outdoor", "Utomhus"],
               ] as const
             ).map(([v, l]) => (
-              <button key={v} onClick={() => setEq({ environment: v })} className={cn("h-9 rounded-full text-[13px] font-medium", env === v ? "bg-ink text-white" : "bg-card-2 text-ink-2")}>
+              <button
+                key={v}
+                aria-pressed={env === v}
+                onClick={() => setEq({ environment: v })}
+                className={cn("h-10 rounded-full border text-[13px] font-medium", env === v ? "glow-soft border-accent text-accent" : "border-line bg-card text-ink-2")}
+              >
                 {l}
               </button>
             ))}
           </div>
-          {env !== "gym" && <p className="mt-2 text-[11px] text-muted">Programmet är byggt för gym. Byt övningar under passet (Alternativ) om utrustning saknas.</p>}
+          {env !== "gym" && <p className="mt-2 text-[11px] text-muted">Programmet är byggt för gym. Byt övningar under passet om utrustning saknas.</p>}
 
           <SectionTitle>Skadehistorik</SectionTitle>
-          <button onClick={() => setTab("injuries")} className="flex w-full items-center gap-3 rounded-[16px] bg-card p-3 text-left">
-            <span className="flex size-7 items-center justify-center rounded-full bg-bad-soft text-bad">
-              <Bandage size={14} />
+          <button onClick={() => setTab("injuries")} className="surface flex w-full items-center gap-3 rounded-[16px] p-3 text-left">
+            <span className="flex size-8 items-center justify-center rounded-full bg-bad-soft text-bad">
+              <Bandage size={15} />
             </span>
             <span className="flex-1 text-[13px]">Hälsena (operation 2026)</span>
             <span className="text-[12px] font-medium text-good">{st.rehab.runningCleared ? "Klartecken" : `Aktiv rehab · fas ${phase?.phase}`}</span>
           </button>
 
-          <SectionTitle>Profil</SectionTitle>
-          <Card className="space-y-2 bg-card-2/50 p-2">
-            <label className="block rounded-[14px] bg-card px-3 py-2">
-              <span className="text-[9px] text-muted">Namn</span>
-              <input defaultValue={st.name} onBlur={(e) => set({ name: e.target.value.trim() })} className="block w-full bg-transparent text-[16px] font-medium outline-none" />
-            </label>
-            <Stepper label="Födelseår" value={st.birthYear ?? 1990} onChange={(v) => set({ birthYear: v })} step={1} />
-            <Stepper label="Kroppsvikt" value={st.bodyWeightKg ?? 80} onChange={(v) => set({ bodyWeightKg: v })} step={0.5} unit="kg" />
-            <Stepper label="Vilopuls" value={st.restingHr ?? 60} onChange={(v) => set({ restingHr: v })} step={1} unit="bpm" />
-            <Stepper label="Maxpuls (0 = okänd)" value={st.maxHr ?? 0} onChange={(v) => set({ maxHr: v || null })} step={1} unit="bpm" />
-          </Card>
-        </>
-      )}
-
-      {tab === "goals" && (
-        <>
-          <SectionTitle>Huvudmål</SectionTitle>
-          <div className="grid grid-cols-3 gap-2">
-            {GOALS.map(({ value, label, icon: Icon }) => (
-              <button
-                key={value}
-                onClick={() => set({ goal: value })}
-                className={cn("flex h-[76px] flex-col items-center justify-center gap-1.5 rounded-[16px] text-[11px] font-medium", st.goal === value ? "bg-accent-soft text-accent-ink" : "bg-card text-ink-2")}
-              >
-                <Icon size={22} strokeWidth={1.5} />
-                {label}
-              </button>
-            ))}
-          </div>
-          <Card className="mt-3 space-y-2 text-[13px] text-ink-2">
-            <p><b className="text-ink">Styrka:</b> dubbel progression – reps först, sedan vikt med minsta steg.</p>
-            <p><b className="text-ink">Kondition:</b> tre pass i veckan som ökar tid, sedan intensitet, max +10 % belastning per vecka.</p>
-            <p><b className="text-ink">Återhämtning:</b> dagsform före varje pass, deload vid stagnation eller låg återhämtning.</p>
+          <Card className="mt-4 space-y-2 text-[13px] text-ink-2">
+            <p>
+              <b className="text-ink">Styrka:</b> dubbel progression – reps först, sedan vikt med minsta steg.
+            </p>
+            <p>
+              <b className="text-ink">Kondition:</b> tre pass i veckan som ökar tid, sedan intensitet, max +10 % belastning per vecka.
+            </p>
+            <p>
+              <b className="text-ink">Återhämtning:</b> dagsform före varje pass, deload vid stagnation eller låg återhämtning.
+            </p>
           </Card>
         </>
       )}
 
       {tab === "equipment" && (
-        <Card className="mt-4 space-y-2 bg-card-2/50 p-2">
+        <Card className="mt-4 space-y-2 p-2">
           <Stepper label="Skivstång" value={st.equipment.barbellKg} onChange={(v) => setEq({ barbellKg: v })} step={2.5} unit="kg" />
           <Stepper label="Minsta steg skivstång (totalt)" value={st.equipment.barbellStepKg} onChange={(v) => setEq({ barbellStepKg: v })} step={0.5} min={0.5} unit="kg" />
           <Stepper label="Hantelsteg" value={st.equipment.dumbbellStepKg} onChange={(v) => setEq({ dumbbellStepKg: v })} step={0.5} min={0.5} unit="kg" />
@@ -167,27 +155,33 @@ export default function SettingsPage() {
         <>
           <SectionTitle>Hälsena – rehabfas</SectionTitle>
           <div className="space-y-2">
-            {ACHILLES_PHASES.map((p) => (
-              <button
-                key={p.phase}
-                onClick={() => {
-                  if (p.phase === st.rehab.phase) return;
-                  if (p.phase > st.rehab.phase && !confirm(`Har fysio godkänt fas ${p.phase} (${p.name})?`)) return;
-                  set({
-                    rehab: {
-                      ...st.rehab,
-                      phase: p.phase,
-                      phaseStartedAt: today(),
-                      approvedPhases: Array.from(new Set([...st.rehab.approvedPhases, p.phase])),
-                    },
-                  });
-                }}
-                className={cn("w-full rounded-[16px] p-3 text-left", st.rehab.phase === p.phase ? "bg-ink text-white" : "bg-card")}
-              >
-                <div className="text-[13px] font-semibold">Fas {p.phase} · {p.name}</div>
-                <div className={cn("text-[11px]", st.rehab.phase === p.phase ? "text-white/60" : "text-muted")}>{p.goal}</div>
-              </button>
-            ))}
+            {ACHILLES_PHASES.map((p) => {
+              const on = st.rehab.phase === p.phase;
+              return (
+                <button
+                  key={p.phase}
+                  aria-pressed={on}
+                  onClick={() => {
+                    if (on) return;
+                    if (p.phase > st.rehab.phase && !confirm(`Har fysio godkänt fas ${p.phase} (${p.name})?`)) return;
+                    set({
+                      rehab: {
+                        ...st.rehab,
+                        phase: p.phase,
+                        phaseStartedAt: today(),
+                        approvedPhases: Array.from(new Set([...st.rehab.approvedPhases, p.phase])),
+                      },
+                    });
+                  }}
+                  className={cn("w-full rounded-[16px] border p-3 text-left", on ? "glow-soft border-accent bg-accent-soft" : "surface")}
+                >
+                  <div className={cn("text-[13px] font-semibold", on && "text-accent-ink")}>
+                    Fas {p.phase} · {p.name}
+                  </div>
+                  <div className="text-[11px] text-muted">{p.goal}</div>
+                </button>
+              );
+            })}
           </div>
           <Card className="mt-3">
             <div className="mb-2 text-[13px] font-medium">Baslinje morgonstelhet (0–10)</div>
@@ -205,7 +199,7 @@ export default function SettingsPage() {
                 if (e.target.checked && !confirm("Har du medicinskt klartecken för löpning och hopp?")) return;
                 set({ rehab: { ...st.rehab, runningCleared: e.target.checked } });
               }}
-              className="size-5 accent-black"
+              className="size-5 accent-[#ff8a3d]"
             />
           </Card>
         </>
@@ -213,6 +207,17 @@ export default function SettingsPage() {
 
       {tab === "other" && (
         <>
+          <SectionTitle>Profil</SectionTitle>
+          <Card className="space-y-2 p-2">
+            <label className="block rounded-[14px] border border-line bg-card-2 px-3 py-2">
+              <span className="text-[9px] text-muted">Namn</span>
+              <input defaultValue={st.name} onBlur={(e) => set({ name: e.target.value.trim() })} className="block w-full bg-transparent text-[16px] font-medium outline-none" />
+            </label>
+            <Stepper label="Födelseår" value={st.birthYear ?? 1990} onChange={(v) => set({ birthYear: v })} step={1} />
+            <Stepper label="Vilopuls" value={st.restingHr ?? 60} onChange={(v) => set({ restingHr: v })} step={1} unit="bpm" />
+            <Stepper label="Maxpuls (0 = okänd)" value={st.maxHr ?? 0} onChange={(v) => set({ maxHr: v || null })} step={1} unit="bpm" />
+            <p className="px-2 pb-1 text-[11px] text-muted">Kroppsvikt loggas under Analys → Kropp.</p>
+          </Card>
           <ProgressionSettings />
           <DataSettings />
         </>
@@ -242,7 +247,7 @@ function ProgressionSettings() {
           type="checkbox"
           checked={st.deloadWeeks.includes(thisWeek)}
           onChange={(e) => set({ deloadWeeks: e.target.checked ? [...st.deloadWeeks, thisWeek] : st.deloadWeeks.filter((w) => w !== thisWeek) })}
-          className="size-5 accent-black"
+          className="size-5 accent-[#ff8a3d]"
         />
       </Card>
 
@@ -301,7 +306,7 @@ function ProgressionSettings() {
                   delete next[slot];
                   set({ cardioPreferred: next });
                 }}
-                className={cn("h-8 rounded-full px-3 text-xs", !st.cardioPreferred[slot] ? "bg-ink text-white" : "bg-card-2")}
+                className={cn("h-8 rounded-full px-3 text-xs", !st.cardioPreferred[slot] ? "bg-accent-grad text-on-accent" : "border border-line bg-card-2")}
               >
                 Auto
               </button>
@@ -309,7 +314,7 @@ function ProgressionSettings() {
                 <button
                   key={m}
                   onClick={() => set({ cardioPreferred: { ...st.cardioPreferred, [slot]: m } })}
-                  className={cn("h-8 rounded-full px-3 text-xs", st.cardioPreferred[slot] === m ? "bg-ink text-white" : "bg-card-2")}
+                  className={cn("h-8 rounded-full px-3 text-xs", st.cardioPreferred[slot] === m ? "bg-accent-grad text-on-accent" : "border border-line bg-card-2")}
                 >
                   {MODALITY_LABEL[m]}
                 </button>
