@@ -81,7 +81,7 @@ Vid Git-kopplad deploy (Workers & Pages → Create → Import a repository):
 | Deploy command | `npx opennextjs-cloudflare deploy` |
 | Non-production branch deploy command | `npx opennextjs-cloudflare upload` |
 
-Projektnamnet måste vara `training-app`, samma som `name` i `wrangler.jsonc`.
+Projektnamnet måste vara `enstrom-training`, samma som `name` i `wrangler.jsonc`.
 
 **Variabler:**
 - `NEXT_PUBLIC_SUPABASE_URL` och `NEXT_PUBLIC_SUPABASE_ANON_KEY` läggs som *build variables*, eftersom de bakas in i klienten vid bygget.
