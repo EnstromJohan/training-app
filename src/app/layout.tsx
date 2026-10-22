@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
 import { AuthGate } from "@/components/auth-gate";
+import { MotionProvider } from "@/components/motion/motion-provider";
 import { PwaRegister } from "@/components/pwa";
 import "./globals.css";
 
@@ -31,9 +32,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="sv">
       <body className={`${inter.variable} antialiased`}>
         <PwaRegister />
-        <AuthGate>
-          <AppShell>{children}</AppShell>
-        </AuthGate>
+        <MotionProvider>
+          <AuthGate>
+            <AppShell>{children}</AppShell>
+          </AuthGate>
+        </MotionProvider>
       </body>
     </html>
   );

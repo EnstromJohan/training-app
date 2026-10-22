@@ -37,7 +37,18 @@ export function timeLeft(t: TimerState, now = Date.now()) {
 export const mmss = (sec: number) => `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
 
 /** Rest ring as in the design: "Vila", mm:ss and a small play/pause button. Idle shows the planned rest. */
-export function RestTimer({ timer, restSec, onChange }: { timer: TimerState | null; restSec: number; onChange: (t: TimerState | null) => void }) {
+export function RestTimer({
+  timer,
+  restSec,
+  onChange,
+  onExpand,
+}: {
+  timer: TimerState | null;
+  restSec: number;
+  onChange: (t: TimerState | null) => void;
+  /** Open the full-screen timer (while resting). */
+  onExpand?: () => void;
+}) {
   const [, tick] = useState(0);
   const left = timer ? timeLeft(timer) : restSec;
   const running = !!timer && timer.pausedLeft == null && left > 0;
@@ -66,7 +77,13 @@ export function RestTimer({ timer, restSec, onChange }: { timer: TimerState | nu
   return (
     <Ring progress={timer ? left / timer.total : 0} size={100} stroke={6} color={timer && left === 0 ? "var(--good)" : "var(--accent)"} track="var(--card-2)" glow={!!timer}>
       <span className="text-[11px] text-ink-2">{timer && left === 0 ? "Kör!" : "Vila"}</span>
-      <span className="tabular text-[24px] font-bold leading-tight">{mmss(left)}</span>
+      {timer && left > 0 && onExpand ? (
+        <button onClick={onExpand} aria-label="Visa vilotimer i helskärm" className="tabular text-[24px] font-bold leading-tight">
+          {mmss(left)}
+        </button>
+      ) : (
+        <span className="tabular text-[24px] font-bold leading-tight">{mmss(left)}</span>
+      )}
       <button
         aria-label={running ? "Pausa vila" : "Starta vila"}
         onClick={toggle}

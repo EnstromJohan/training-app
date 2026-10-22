@@ -2,9 +2,9 @@ import { useId } from "react";
 import type { Muscle, SessionCategory } from "@/lib/engine/types";
 
 // Stylised anatomy (front/back). Left-half paths are mirrored for the right side.
-type Part = { m: Muscle | null; d: string };
+export type Part = { m: Muscle | null; d: string };
 
-const FRONT: Part[] = [
+export const FRONT: Part[] = [
   { m: "back", d: "M90 60 Q78 66 66 70 L92 70 Z" },
   { m: "side_delts", d: "M66 70 Q50 72 46 92 Q48 100 54 98 Q56 84 64 77 Z" },
   { m: "front_delts", d: "M67 71 Q78 70 82 76 Q74 86 66 100 Q58 98 58 88 Q60 78 67 71 Z" },
@@ -18,7 +18,7 @@ const FRONT: Part[] = [
   { m: "calves", d: "M72 302 Q67 336 74 380 L84 380 Q90 340 88 304 Z" },
 ];
 
-const BACK: Part[] = [
+export const BACK: Part[] = [
   { m: "back", d: "M90 52 Q78 64 64 72 Q80 80 99 96 L99 52 Z" },
   { m: "side_delts", d: "M64 70 Q50 70 46 86 L52 89 Q56 78 66 74 Z" },
   { m: "rear_delts", d: "M66 76 Q54 80 52 92 Q54 100 59 98 Q62 86 72 81 Z" },
@@ -31,7 +31,7 @@ const BACK: Part[] = [
   { m: "calves", d: "M70 297 Q64 320 70 350 Q78 360 86 352 Q92 324 88 299 Z" },
 ];
 
-const SKIN_PARTS = (
+export const SKIN_PARTS = (
   <>
     <ellipse cx="100" cy="34" rx="15" ry="19" />
     <path d="M92 50 L108 50 L110 62 L90 62 Z" />

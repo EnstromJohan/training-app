@@ -1,1 +1,0 @@
-export { MuscleMap } from "./anatomy";

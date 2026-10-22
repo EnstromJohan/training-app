@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AnatomyFigure, type Fills } from "@/components/anatomy";
+import { MuscleHeatmap } from "@/components/motion/muscle-heatmap";
 import { Card, PillTabs, ScreenHeader, Segmented, cn, kg } from "@/components/ui";
 import { exposuresByExercise, GROUP_TARGETS, groupVolume } from "@/lib/coach";
 import { exposureE1rm } from "@/lib/engine/strength/e1rm";
@@ -29,6 +29,8 @@ export default function MusclesPage() {
   const t = today();
   const [tab, setTab] = useState<Tab>("volume");
   const [weeks, setWeeks] = useState<"4" | "8" | "12">("4");
+  const [selected, setSelected] = useState<string | null>(null);
+  const toggle = (key: string) => setSelected((cur) => (cur === key ? null : key));
   const w = Number(weeks);
   const groups = groupVolume(s, t, w);
   const from = addDays(weekStart(t), -7 * (w - 1));
@@ -46,12 +48,6 @@ export default function MusclesPage() {
     progress[key] = ch.length ? ch.reduce((a, b) => a + b, 0) / ch.length : null;
   }
 
-  const fills: Fills = {};
-  for (const g of groups) {
-    const intensity = Math.min(1, Math.max(0.25, g.pct));
-    const color = `rgba(255,138,61,${intensity})`;
-    for (const m of GROUP_TARGETS[g.key].muscles) fills[m] = color;
-  }
 
   const valueFor = (key: GroupKey) => {
     const g = groups.find((x) => x.key === key)!;
@@ -100,22 +96,33 @@ export default function MusclesPage() {
 
       {tab !== "symmetry" ? (
         <>
-          <div className="relative mx-auto mt-2 h-[380px] max-w-[360px]">
-            <div className="absolute inset-0 flex justify-center">
-              <AnatomyFigure view="front" fills={fills} viewBox="24 6 152 400" className="h-full w-auto drop-shadow-[0_0_24px_rgba(255,138,61,0.25)]" />
-            </div>
-            {(Object.keys(GROUP_TARGETS) as GroupKey[]).map((key) => {
-              const g = groups.find((x) => x.key === key)!;
-              return (
-                <div key={key} className={cn("absolute", POS[key])}>
-                  <div className="text-[13px] text-ink-2">{g.label}</div>
-                  <div className="tabular flex items-center gap-1.5 text-[22px] font-bold" style={{ justifyContent: POS[key].includes("right") ? "flex-end" : undefined }}>
-                    {tab === "volume" && <span className="size-2 rounded-full" style={{ background: STATUS_COLOR[g.status] }} />}
-                    {valueFor(key)}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="mx-auto mt-2 max-w-[360px]">
+            <MuscleHeatmap
+              className="h-[360px]"
+              selected={selected}
+              onSelect={setSelected}
+              data={groups.map((g) => ({ key: g.key, label: g.label, muscles: GROUP_TARGETS[g.key].muscles, sets: g.perWeek }))}
+            >
+              {(Object.keys(GROUP_TARGETS) as GroupKey[]).map((key) => {
+                const g = groups.find((x) => x.key === key)!;
+                const on = selected === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => toggle(key)}
+                    className={cn("absolute transition-opacity", POS[key], selected != null && !on && "opacity-45")}
+                  >
+                    <div className={cn("text-[13px]", on ? "font-semibold text-accent" : "text-ink-2")}>{g.label}</div>
+                    <div className="tabular flex items-center gap-1.5 text-[22px] font-bold" style={{ justifyContent: POS[key].includes("right") ? "flex-end" : undefined }}>
+                      {tab === "volume" && <span className="size-2 rounded-full" style={{ background: STATUS_COLOR[g.status] }} />}
+                      {valueFor(key)}
+                    </div>
+                  </button>
+                );
+              })}
+            </MuscleHeatmap>
           </div>
           {tab === "volume" && (
             <div className="mt-1 flex justify-center gap-4 text-[12px] text-ink-2">
@@ -130,15 +137,27 @@ export default function MusclesPage() {
 
           <Card className="mt-4 divide-y divide-line px-3 py-1">
             {groups.map((g) => (
-              <div key={g.key} className="grid grid-cols-[1fr_auto_auto] items-center gap-3 py-2.5 text-[13px]">
-                <span>{g.label}</span>
+              <button
+                key={g.key}
+                type="button"
+                aria-pressed={selected === g.key}
+                onClick={() => toggle(g.key)}
+                className={cn(
+                  "-mx-3 grid w-[calc(100%+1.5rem)] grid-cols-[1fr_auto_auto] items-center gap-3 px-3 py-2.5 text-left text-[13px] transition-colors",
+                  selected === g.key && "bg-accent/10",
+                )}
+              >
+                <span className={cn("flex items-center gap-2", selected === g.key && "font-semibold text-accent")}>
+                  <span className={cn("h-4 w-[3px] rounded-full", selected === g.key ? "bg-accent shadow-[0_0_8px_rgba(255,138,61,0.9)]" : "bg-transparent")} />
+                  {g.label}
+                </span>
                 <span className="tabular text-ink-2">
                   {kg(Math.round(g.perWeek * 10) / 10)} / {GROUP_TARGETS[g.key].target} set/v
                 </span>
                 <span className={cn("tabular w-14 text-right font-medium", g.change == null ? "text-muted" : g.change >= 0 ? "text-good" : "text-bad")}>
                   {g.change == null ? "–" : `${g.change >= 0 ? "+" : ""}${Math.round(g.change * 100)}%`}
                 </span>
-              </div>
+              </button>
             ))}
           </Card>
           <p className="mt-2 px-1 text-[11px] text-muted">

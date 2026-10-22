@@ -87,15 +87,6 @@ input[type="number"] {
   scrollbar-width: none;
 }
 
-@keyframes pop {
-  0% { transform: scale(0.9); }
-  60% { transform: scale(1.06); }
-  100% { transform: scale(1); }
-}
-.animate-pop {
-  animation: pop 0.25s ease-out;
-}
-
 /* Level slider (settings) – thin track, peach thumb */
 .level-slider {
   -webkit-appearance: none;
@@ -143,16 +134,6 @@ a {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-@keyframes page-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
-}
-/* No fill-mode: once finished the animation has no effect, so it never creates a stacking
-   context / containing block that would trap fixed sheets under the bottom nav. */
-.animate-page {
-  animation: page-in 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 /* Dark-theme surfaces & glow (design: orange accent with soft light).

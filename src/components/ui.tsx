@@ -5,6 +5,7 @@ import { twMerge } from "tailwind-merge";
 import { ChevronLeft, Minus, MoreHorizontal, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { Tick } from "./motion/tick";
 
 export const cn = (...xs: ClassValue[]) => twMerge(clsx(xs));
 
@@ -156,7 +157,7 @@ export function Stepper({
         <Minus size={17} strokeWidth={2} />
       </button>
       <span className={cn("tabular font-bold leading-none", big ? "text-[26px]" : "text-[22px]")}>
-        {fmt(value)}
+        <Tick value={value}>{fmt(value)}</Tick>
         {unit && <span className="ml-1 text-[13px] font-medium text-ink-2">{unit}</span>}
       </span>
       <button

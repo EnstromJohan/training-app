@@ -6,8 +6,11 @@ import { ArrowRight, Clock, Dumbbell, Footprints, HeartPulse } from "lucide-reac
 import { HeroArt } from "@/components/hero-art";
 import { IMAGES, Photo } from "@/components/photo";
 import { ReadinessSheet } from "@/components/readiness-sheet";
+import { CountUp } from "@/components/motion/count-up";
+import { SwipeToConfirm } from "@/components/motion/swipe-to-confirm";
+import { WeekBars } from "@/components/motion/week-bars";
 import { SessionThumb } from "@/components/anatomy";
-import { IconCircle, Ring, Scale, cn } from "@/components/ui";
+import { IconCircle, Ring, Scale } from "@/components/ui";
 import {
   dailyVolumeThisWeek,
   dayMinutes,
@@ -48,7 +51,9 @@ export default function Dashboard() {
   const nextIsToday = !!active || !!todayDay;
   const counts = weekCounts(s, t);
   const volume = dailyVolumeThisWeek(s, t);
-  const maxVol = Math.max(1, ...volume.map((v) => v.tonnage));
+  const [volDay, setVolDay] = useState<string | null>(null);
+  const weekTonnage = volume.reduce((a, v) => a + v.tonnage, 0);
+  const shownTonnage = volDay ? (volume.find((v) => v.date === volDay)?.tonnage ?? 0) : weekTonnage;
   const minutes = nextDay ? dayMinutes(s, nextDay, plan.next?.date ?? t) : null;
   const morning = pendingMorningCheck(s, t);
   const deload = deloadRecommendation(s, t);
@@ -138,9 +143,7 @@ export default function Dashboard() {
                 Fortsätt pass <ArrowRight size={18} className="absolute right-5" />
               </Link>
             ) : nextIsToday ? (
-              <button onClick={() => setSheet(true)} className="bg-accent-grad glow relative mt-4 flex h-[52px] w-full items-center justify-center rounded-full text-[16px] font-semibold text-on-accent active:scale-[0.99]">
-                Starta pass <ArrowRight size={18} className="absolute right-5" />
-              </button>
+              <SwipeToConfirm className="mt-4" label="Svep för att starta passet" onConfirm={() => setSheet(true)} />
             ) : (
               <Link href="/schedule" className="relative mt-4 flex h-[52px] items-center justify-center rounded-full border border-line bg-card-2 text-[15px] font-semibold">
                 Se veckoschemat <ArrowRight size={18} className="absolute right-5" />
@@ -152,33 +155,33 @@ export default function Dashboard() {
         )}
 
         {/* This week */}
-        <div>
-          <h2 className="mb-2 text-[16px] font-semibold">Denna vecka</h2>
-          <div className="surface grid grid-cols-7 gap-1.5 rounded-[18px] p-2.5">
-            {volume.map((v, i) => {
-              const isToday = v.date === t;
-              const future = v.date > t;
-              const h = v.tonnage ? Math.max(28, (v.tonnage / maxVol) * 100) : 0;
-              return (
-                <Link key={v.date} href="/schedule" className="flex flex-col items-center gap-1.5">
-                  <div
-                    className={cn(
-                      "relative flex h-12 w-full items-end justify-center overflow-hidden rounded-[9px] border",
-                      isToday ? "border-accent/60" : "border-line",
-                      "bg-[#101010]",
-                    )}
-                  >
-                    {v.tonnage > 0 ? (
-                      <div className="bg-accent-grad glow-soft w-full rounded-[7px]" style={{ height: `${h}%` }} />
-                    ) : (
-                      <span className={cn("mb-3 size-1.5 rounded-full", v.trained ? "bg-accent" : future ? "bg-[#3a3a3a]" : "bg-[#2a2a2a]")} />
-                    )}
-                  </div>
-                  <span className={cn("text-[11px]", isToday ? "font-semibold text-accent" : "text-muted")}>{WD_LETTER[i]}</span>
-                </Link>
-              );
-            })}
+        <div className="surface rounded-[20px] p-4">
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-[16px] font-semibold">Denna vecka</h2>
+            <Link href="/schedule" className="text-[12px] text-muted">
+              Schema
+            </Link>
           </div>
+          <div className="mb-3 mt-1">
+            <div className="flex items-baseline gap-1.5">
+              <CountUp value={Math.round(shownTonnage)} className="text-[40px] font-bold leading-none tracking-tight" />
+              <span className="text-[15px] font-semibold text-ink-2">kg</span>
+            </div>
+            <p className="mt-1 text-[12px] text-muted">{volDay ? `Volym ${WD_LONG[weekday(volDay) - 1]}` : "Total volym, arbetsset"}</p>
+          </div>
+          <WeekBars
+            selected={volDay}
+            onSelect={setVolDay}
+            data={volume.map((v, i) => ({
+              key: v.date,
+              label: WD_LETTER[i],
+              name: WD_LONG[i],
+              value: v.tonnage,
+              today: v.date === t,
+              marked: v.trained,
+              future: v.date > t,
+            }))}
+          />
         </div>
 
         {morning && (

@@ -2,14 +2,17 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { Check, ChevronRight, Dumbbell, Footprints, History, Lightbulb, Plus, Repeat, Trophy, Video } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Check, ChevronRight, Dumbbell, Footprints, History, Lightbulb, Minus, Plus, Repeat, Trophy, Video } from "lucide-react";
 import { MUSCLE_LABEL } from "@/components/muscle-labels";
 import { AnatomyFigure, type Fills } from "@/components/anatomy";
 import { IMAGES, Photo } from "@/components/photo";
 import { Button, Card, Chip, Scale, ScreenHeader, Sheet, Stepper, cn, kg } from "@/components/ui";
 import { RestTimer, loadTimer, saveTimer, type TimerState } from "@/components/workout/rest-timer";
 import { RehabSheet } from "@/components/workout/rehab-sheet";
+import { RestTimerOverlay } from "@/components/motion/rest-timer-overlay";
+import { SwipeToConfirm } from "@/components/motion/swipe-to-confirm";
+import { Tick } from "@/components/motion/tick";
 import { cardioWeek, exposuresByExercise, prescribeFor, rehabPlan, swapOptions } from "@/lib/coach";
 import { loadStep } from "@/lib/engine/strength/rounding";
 import { e1rm, exposureE1rm } from "@/lib/engine/strength/e1rm";
@@ -105,6 +108,8 @@ function ActiveWorkout({ sessionId }: { sessionId: string }) {
   const [editorOpen, setEditorOpen] = useState(false);
   const [sheet, setSheet] = useState<null | "menu" | "swap" | "rehab" | "finish" | "tips" | "history">(null);
   const [selfCalibrate, setSelfCalibrate] = useState<Record<string, boolean>>({});
+  const [restOpen, setRestOpen] = useState(false);
+  const closeRest = useCallback(() => setRestOpen(false), []);
   const elapsed = useElapsed(session.startedAt);
   useWakeLock(true);
 
@@ -168,6 +173,7 @@ function ActiveWorkout({ sessionId }: { sessionId: string }) {
     const doneNow = activeIndex + 1 >= p.sets.length;
     if (!(doneNow && isLastExercise)) {
       setTimer({ endsAt: Date.now() + p.restSec * 1000, total: p.restSec, pausedLeft: null });
+      setRestOpen(true);
     }
     if (doneNow && !isLastExercise) setIdx(idx + 1);
   };
@@ -325,6 +331,64 @@ function ActiveWorkout({ sessionId }: { sessionId: string }) {
             </div>
           )}
 
+          {/* Current set: the weight dominates; values tick when changed */}
+          {!(allDone && editing == null) && (
+            <div className="surface mt-3 rounded-[22px] px-4 pb-4 pt-3">
+              <div className="text-[12px] text-muted">
+                Set {activeIndex + 1} av {Math.max(p.sets.length, activeIndex + 1)}
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  aria-label={`Minska vikt med ${kg(step)} kg`}
+                  onClick={() => patch({ weight: Math.max(0, Math.round((d.weight - step) * 100) / 100) })}
+                  className="flex size-12 shrink-0 items-center justify-center rounded-full border border-line bg-card-2 active:scale-95"
+                >
+                  <Minus size={20} />
+                </button>
+                <div className="flex min-w-0 items-baseline justify-center" aria-live="polite">
+                  <Tick value={d.weight} className="tabular inline-block text-[clamp(64px,24vw,110px)] font-black leading-[0.95] tracking-[-0.045em]">
+                    {kg(d.weight)}
+                  </Tick>
+                  <span className="ml-1 text-[18px] font-semibold text-ink-2">kg</span>
+                </div>
+                <button
+                  aria-label={`Öka vikt med ${kg(step)} kg`}
+                  onClick={() => patch({ weight: Math.round((d.weight + step) * 100) / 100 })}
+                  className="flex size-12 shrink-0 items-center justify-center rounded-full border border-line bg-card-2 active:scale-95"
+                >
+                  <Plus size={20} />
+                </button>
+              </div>
+              <div className="mt-3 grid grid-cols-[1fr_auto] items-center gap-2">
+                <Stepper label="Reps" value={d.reps} onChange={(v) => patch({ reps: v })} step={1} />
+                <div className="flex gap-1" role="group" aria-label="RIR">
+                  {RIR_OPTIONS.map((r) => (
+                    <button
+                      key={r}
+                      aria-pressed={d.rir === r}
+                      aria-label={`RIR ${r === 4 ? "4 eller mer" : r}`}
+                      onClick={() => patch({ rir: r })}
+                      className={cn(
+                        "tabular flex h-[56px] w-9 flex-col items-center justify-center rounded-[12px] text-[14px] font-semibold transition-colors",
+                        d.rir === r ? "bg-accent-grad text-on-accent" : r >= target.rirMin && r <= target.rirMax ? "border border-good/40 bg-good-soft text-good-ink" : "border border-line bg-card-2 text-ink-2",
+                      )}
+                    >
+                      <span className="text-[8px] font-medium opacity-70">RIR</span>
+                      {r === 4 ? "4+" : r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <SwipeToConfirm
+            key={allDone && editing == null ? "advance" : "set"}
+            className="mt-3"
+            label={allDone && editing == null ? (isLastExercise ? "Svep för att avsluta passet" : "Svep till nästa övning") : `Svep – set ${activeIndex + 1} klart`}
+            onConfirm={() => (allDone && editing == null ? (isLastExercise ? setSheet("finish") : goTo(idx + 1)) : completeSet())}
+          />
+
           {/* Set table */}
           <div className="surface mt-3 overflow-hidden rounded-[18px]">
             <div className="grid grid-cols-[44px_1fr_1.3fr_1fr_44px] px-1 pb-1 pt-2.5 text-[11px] text-muted">
@@ -420,16 +484,8 @@ function ActiveWorkout({ sessionId }: { sessionId: string }) {
       )}
 
       {/* Rest · complete · next */}
-      <div className="mt-4 grid grid-cols-[auto_auto_1fr] items-center gap-3">
-        <RestTimer timer={timer} restSec={p.restSec} onChange={setTimer} />
-        <button
-          aria-label="Markera set som klart"
-          onClick={() => (needsCalibration ? undefined : allDone && editing == null ? (isLastExercise ? setSheet("finish") : goTo(idx + 1)) : completeSet())}
-          disabled={needsCalibration}
-          className="glow-soft flex size-[68px] items-center justify-center rounded-full border border-accent/50 bg-card-2 text-ink transition active:scale-95 disabled:opacity-40"
-        >
-          <Check size={30} strokeWidth={2.2} />
-        </button>
+      <div className="mt-4 grid grid-cols-[auto_1fr] items-center gap-3">
+        <RestTimer timer={timer} restSec={p.restSec} onChange={setTimer} onExpand={() => setRestOpen(true)} />
         {nextItem ? (
           <button onClick={() => goTo(idx + 1)} className="surface flex min-w-0 items-center gap-2 overflow-hidden rounded-[16px] p-2 text-left">
             <div className="min-w-0 flex-1 pl-1">
@@ -446,7 +502,7 @@ function ActiveWorkout({ sessionId }: { sessionId: string }) {
             />
           </button>
         ) : (
-          <Button onClick={() => setSheet("finish")} className="h-[68px] rounded-[18px]">
+          <Button onClick={() => setSheet("finish")} className="h-[68px] w-full rounded-[18px]">
             Avsluta pass
           </Button>
         )}
@@ -476,6 +532,40 @@ function ActiveWorkout({ sessionId }: { sessionId: string }) {
           Avsluta passet tidigt
         </button>
       )}
+
+      <RestTimerOverlay
+        open={restOpen}
+        timer={timer}
+        onChange={setTimer}
+        onClose={closeRest}
+        onDone={closeRest}
+        next={
+          allDone ? (
+            nextItem ? (
+              <>Nästa: <b className="text-ink">{EXERCISES[nextItem.exerciseId]?.name}</b></>
+            ) : null
+          ) : (
+            <>
+              Nästa: <b className="text-ink">Set {activeIndex + 1}</b> · {target.reps} reps{target.weight != null && ` @ ${kg(target.weight)} kg`}
+            </>
+          )
+        }
+        extra={
+          <button
+            onClick={() => {
+              closeRest();
+              setSheet("rehab");
+            }}
+            className="surface flex w-full items-center gap-3 rounded-[16px] p-3 text-left"
+          >
+            <Footprints size={18} className="shrink-0 text-accent" />
+            <span className="min-w-0 flex-1 truncate text-[13px]">
+              <b>Hälsene-rehab under vilan</b> <span className="text-muted">· {rehab.exercises.map((e) => e.name).join(", ")}</span>
+            </span>
+            <ChevronRight size={16} className="text-muted" />
+          </button>
+        }
+      />
 
       {/* Set editor */}
       <Sheet open={editorOpen} onClose={() => { setEditorOpen(false); setEditing(null); }} title={editing != null && editing < logged.length ? `Ändra set ${editing + 1}` : `Set ${activeIndex + 1}`}>

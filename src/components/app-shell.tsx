@@ -32,7 +32,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh bg-bg">
       <div className="mx-auto min-h-dvh max-w-md">
-        <main key={path} className={cn("animate-page px-4 pt-[env(safe-area-inset-top)]", immersive ? "pb-8" : "pb-28")}>
+        <main className={cn("px-4 pt-[env(safe-area-inset-top)]", immersive ? "pb-8" : "pb-28")}>
           {children}
         </main>
         {!immersive && (
