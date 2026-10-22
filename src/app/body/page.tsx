@@ -401,6 +401,8 @@ function Photos() {
         </div>
       )}
 
+      <AiBatchCard photos={photos} />
+
       {photos.length === 0 ? (
         <p className="mt-6 text-center text-[13px] text-muted">Inga foton än. Ta samma vinklar, i samma ljus, var fjärde vecka.</p>
       ) : (
@@ -532,30 +534,114 @@ function CompareSheet({ photos, pose, onClose }: { photos: ProgressPhotoRec[]; p
 }
 
 /** AI body-fat estimate for one photo, with explicit opt-in before anything leaves the device. */
-function AiEstimatePanel({ photo }: { photo: ProgressPhotoRec }) {
+/** Sends one photo for an AI estimate, with the measurements closest to its date as supporting context. */
+function useRunEstimate() {
   const store = useStore();
   const { s } = store;
+  return async (photo: ProgressPhotoRec) => {
+    const list = s.body.filter((b) => !b.deletedAt).sort((a, b) => a.date.localeCompare(b.date));
+    const near = [...list].reverse().find((b) => b.date <= photo.date) ?? list.at(-1);
+    const waist = [...list].reverse().find((b) => b.waistCm != null && b.date <= photo.date)?.waistCm ?? null;
+    const result = await requestBodyEstimate(photo, {
+      sex: s.settings.sex ?? null,
+      heightCm: s.settings.heightCm ?? null,
+      weightKg: near?.weightKg ?? s.settings.bodyWeightKg ?? null,
+      waistCm: waist,
+      rfm: rfm(s.settings.heightCm, waist, s.settings.sex),
+    });
+    await store.setPhotoEstimate(photo.id, result);
+  };
+}
+
+function AiConsentSheet({ open, onClose, onAccept }: { open: boolean; onClose: () => void; onAccept: () => void }) {
+  const store = useStore();
+  return (
+    <Sheet open={open} onClose={onClose} title="Skicka foto för AI-analys?">
+      <div className="space-y-3 text-[14px] text-ink-2">
+        <p>
+          Fotot skickas (nedskalat, utan metadata) till Anthropics API, där Claude uppskattar ett kroppsfettintervall. Appens server sparar inte bilden – bara resultatet sparas, på fotot.
+        </p>
+        <p>Anthropic behandlar bilden enligt sina villkor för API-data och använder den inte för att träna modeller. Du väljer varje gång vilket foto som analyseras.</p>
+        <p className="text-[12px] text-muted">Du kan återkalla samtycket under Inställningar → Övrigt.</p>
+        <Button
+          size="lg"
+          className="w-full"
+          onClick={async () => {
+            await store.updateSettings({ aiPhotoConsent: true });
+            onClose();
+            onAccept();
+          }}
+        >
+          Jag godkänner – analysera
+        </Button>
+        <Button variant="ghost" className="w-full" onClick={onClose}>
+          Avbryt
+        </Button>
+      </div>
+    </Sheet>
+  );
+}
+
+/** One-tap analysis of the newest photo of each pose that has no AI estimate yet. */
+function AiBatchCard({ photos }: { photos: ProgressPhotoRec[] }) {
+  const { s } = useStore();
+  const runEstimate = useRunEstimate();
+  const [progress, setProgress] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [consentOpen, setConsentOpen] = useState(false);
+  const avail = aiAvailability();
+  // `photos` is sorted newest first.
+  const pending = (Object.keys(POSE_LABEL) as PhotoPose[])
+    .map((p) => photos.find((x) => x.pose === p))
+    .filter((p): p is ProgressPhotoRec => !!p && !p.aiEstimate);
+  if (pending.length === 0) return null;
+
+  const run = async () => {
+    setError(null);
+    try {
+      for (const [i, photo] of pending.entries()) {
+        setProgress(`Analyserar ${i + 1} av ${pending.length}…`);
+        await runEstimate(photo);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Analysen misslyckades.");
+    } finally {
+      setProgress(null);
+    }
+  };
+
+  return (
+    <Card className="mt-3 space-y-2">
+      <div className="flex items-center gap-2 text-[13px] font-semibold">
+        <Sparkles size={15} className="text-accent" /> AI-uppskattning av kroppsfett
+      </div>
+      <p className="text-[12px] text-ink-2">
+        Analyserar ditt senaste foto {pending.map((p) => POSE_LABEL[p.pose].toLowerCase()).join(", ")}. Resultatet visas på varje foto – tryck på fotot för detaljer.
+      </p>
+      <Button className="w-full" disabled={!!progress || !avail.ok} onClick={() => (s.settings.aiPhotoConsent ? run() : setConsentOpen(true))}>
+        <Sparkles size={16} /> {progress ?? `Analysera ${pending.length === 1 ? "fotot" : `${pending.length} foton`}`}
+      </Button>
+      {!avail.ok && <p className="text-[11px] text-muted">{avail.reason}</p>}
+      {error && <p className="text-[12px] text-bad">{error}</p>}
+      <AiConsentSheet open={consentOpen} onClose={() => setConsentOpen(false)} onAccept={run} />
+    </Card>
+  );
+}
+
+function AiEstimatePanel({ photo }: { photo: ProgressPhotoRec }) {
+  const { s } = useStore();
+  const runEstimate = useRunEstimate();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [consentOpen, setConsentOpen] = useState(false);
   const est = photo.aiEstimate;
   const avail = aiAvailability();
-  const list = s.body.filter((b) => !b.deletedAt).sort((a, b) => a.date.localeCompare(b.date));
-  const near = [...list].reverse().find((b) => b.date <= photo.date) ?? list.at(-1);
-  const waist = [...list].reverse().find((b) => b.waistCm != null && b.date <= photo.date)?.waistCm ?? null;
 
   const run = async () => {
     setBusy(true);
     setError(null);
     try {
-      const result = await requestBodyEstimate(photo, {
-        sex: s.settings.sex ?? null,
-        heightCm: s.settings.heightCm ?? null,
-        weightKg: near?.weightKg ?? s.settings.bodyWeightKg ?? null,
-        waistCm: waist,
-        rfm: rfm(s.settings.heightCm, waist, s.settings.sex),
-      });
-      await store.setPhotoEstimate(photo.id, result);
+      await runEstimate(photo);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Analysen misslyckades.");
     } finally {
@@ -607,29 +693,7 @@ function AiEstimatePanel({ photo }: { photo: ProgressPhotoRec }) {
       {!avail.ok && <p className="mt-2 text-[11px] text-muted">{avail.reason}</p>}
       {error && <p className="mt-2 text-[12px] text-bad">{error}</p>}
 
-      <Sheet open={consentOpen} onClose={() => setConsentOpen(false)} title="Skicka foto för AI-analys?">
-        <div className="space-y-3 text-[14px] text-ink-2">
-          <p>
-            Fotot skickas (nedskalat, utan metadata) till Anthropics API, där Claude uppskattar ett kroppsfettintervall. Appens server sparar inte bilden – bara resultatet sparas, på fotot.
-          </p>
-          <p>Anthropic behandlar bilden enligt sina villkor för API-data och använder den inte för att träna modeller. Du väljer varje gång vilket foto som analyseras.</p>
-          <p className="text-[12px] text-muted">Du kan återkalla samtycket under Inställningar → Övrigt.</p>
-          <Button
-            size="lg"
-            className="w-full"
-            onClick={async () => {
-              await store.updateSettings({ aiPhotoConsent: true });
-              setConsentOpen(false);
-              run();
-            }}
-          >
-            Jag godkänner – analysera
-          </Button>
-          <Button variant="ghost" className="w-full" onClick={() => setConsentOpen(false)}>
-            Avbryt
-          </Button>
-        </div>
-      </Sheet>
+      <AiConsentSheet open={consentOpen} onClose={() => setConsentOpen(false)} onAccept={run} />
     </div>
   );
 }
