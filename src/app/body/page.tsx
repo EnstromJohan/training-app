@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Camera, Plus, Sparkles, Trash2 } from "lucide-react";
+import { Camera, Info, Plus, Sparkles, Trash2 } from "lucide-react";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AnatomyFigure } from "@/components/anatomy";
 import { ProgressPhoto } from "@/components/progress-photo";
 import { Button, Card, PillTabs, ScreenHeader, SectionTitle, Sheet, Stepper, cn } from "@/components/ui";
 import type { BodyMeasurementRec, PhotoPose, ProgressPhotoRec } from "@/lib/db/records";
+import { bmi, estimatedMuscleMass, fatFreeMass, ffmi, waistToHeight, waistToHip } from "@/lib/engine/body/metrics";
 import { rfm } from "@/lib/engine/body/rfm";
 import { addDays, daysBetween } from "@/lib/engine/weekly/dates";
 import { aiAvailability, requestBodyEstimate } from "@/lib/ai-estimate";
@@ -15,15 +16,15 @@ import { useStore, today } from "@/lib/store";
 type Tab = "overview" | "measures" | "photos" | "composition";
 type Field = "weightKg" | "bodyFatPct" | "muscleMassKg" | "waistCm" | "chestCm" | "armCm" | "thighCm" | "hipsCm";
 
-const FIELDS: Record<Field, { label: string; unit: string; step: number; good: "up" | "down" | "none" }> = {
-  weightKg: { label: "Vikt", unit: "kg", step: 0.1, good: "none" },
-  bodyFatPct: { label: "Kroppsfett", unit: "%", step: 0.1, good: "down" },
-  muscleMassKg: { label: "Muskelmassa", unit: "kg", step: 0.1, good: "up" },
-  waistCm: { label: "Midja", unit: "cm", step: 0.5, good: "down" },
-  chestCm: { label: "Bröst", unit: "cm", step: 0.5, good: "up" },
-  armCm: { label: "Överarm", unit: "cm", step: 0.5, good: "up" },
-  thighCm: { label: "Lår", unit: "cm", step: 0.5, good: "up" },
-  hipsCm: { label: "Höft", unit: "cm", step: 0.5, good: "none" },
+const FIELDS: Record<Field, { label: string; unit: string; step: number; good: "up" | "down" | "none"; how: string }> = {
+  weightKg: { label: "Vikt", unit: "kg", step: 0.1, good: "none", how: "På morgonen efter toalettbesök, före mat och dryck, med minimalt med kläder och på samma våg varje gång. Vikten svänger 1–2 kg mellan dagar – följ trenden, inte enskilda vägningar." },
+  bodyFatPct: { label: "Kroppsfett", unit: "%", step: 0.1, good: "down", how: "Från smart våg eller InBody: samma tid på dagen, fastande och inte direkt efter träning eller dusch. Saknar du våg kan du använda uppskattningen från midjemåttet under Beräknat." },
+  muscleMassKg: { label: "Muskelmassa", unit: "kg", step: 0.1, good: "up", how: "Skelettmuskelmassa från smart våg eller InBody, mätt under samma förhållanden som kroppsfettet. Saknar du våg finns en grov uppskattning under Beräknat." },
+  waistCm: { label: "Midja", unit: "cm", step: 0.5, good: "down", how: "I höjd med naveln, stående med avslappnad mage, efter en vanlig utandning. Måttbandet vågrätt runt kroppen, tätt men utan att trycka in huden." },
+  chestCm: { label: "Bröst", unit: "cm", step: 0.5, good: "up", how: "Under armhålorna, över bröstvårtorna, med armarna längs sidorna. Läs av efter en vanlig utandning, måttbandet vågrätt även över ryggen." },
+  armCm: { label: "Överarm", unit: "cm", step: 0.5, good: "up", how: "Runt överarmens tjockaste del, mitt mellan axel och armbåge. Välj avslappnad eller spänd arm och mät likadant varje gång, på samma sida." },
+  thighCm: { label: "Lår", unit: "cm", step: 0.5, good: "up", how: "Runt lårets tjockaste del, strax under skinkvecket, stående med vikten jämnt på båda benen. Samma sida varje gång." },
+  hipsCm: { label: "Höft", unit: "cm", step: 0.5, good: "none", how: "Runt sätets bredaste del, stående med fötterna ihop. Måttbandet vågrätt runt hela kroppen." },
 };
 const POSE_LABEL: Record<PhotoPose, string> = { front: "Framifrån", side: "Från sidan", back: "Bakifrån" };
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
@@ -698,6 +699,87 @@ function AiEstimatePanel({ photo }: { photo: ProgressPhotoRec }) {
   );
 }
 
+/** Live helper calculations from the values being logged plus height and sex from settings. */
+function Derived({ values, onUse }: { values: Record<Field, number | null>; onUse: (f: Field, v: number) => void }) {
+  const { s } = useStore();
+  const { heightCm, sex } = s.settings;
+  const fromWaist = rfm(heightCm, values.waistCm, sex);
+  const fatPct = values.bodyFatPct ?? fromWaist;
+  const ffm = fatFreeMass(values.weightKg, fatPct);
+  const muscle = estimatedMuscleMass(ffm, sex);
+  const ffmiV = ffmi(ffm, heightCm);
+  const whtr = waistToHeight(values.waistCm, heightCm);
+  const whr = waistToHip(values.waistCm, values.hipsCm);
+  const bmiV = bmi(values.weightKg, heightCm);
+  const whrLimit = sex === "female" ? 0.85 : 0.9;
+
+  const rows: { label: string; value: string; note: string; use?: () => void }[] = [];
+  if (fromWaist != null)
+    rows.push({
+      label: "Kroppsfett från midjan",
+      value: `${fmt(fromWaist)} %`,
+      note: "RFM: räknas från längd och midjemått, ungefär lika träffsäkert som en smart våg.",
+      use: values.bodyFatPct !== fromWaist ? () => onUse("bodyFatPct", fromWaist) : undefined,
+    });
+  if (ffm != null)
+    rows.push({
+      label: "Fettfri massa",
+      value: `${fmt(ffm)} kg`,
+      note: `Vikten minus fettet (muskler, skelett, vatten, organ)${values.bodyFatPct == null ? ", med kroppsfett från midjan" : ""}.`,
+    });
+  if (muscle != null)
+    rows.push({
+      label: "Uppskattad muskelmassa",
+      value: `${fmt(muscle)} kg`,
+      note: "Grov uppskattning (ungefär hälften av den fettfria massan, ±3 kg). En smart våg mäter bättre.",
+      use: values.muscleMassKg !== muscle ? () => onUse("muscleMassKg", muscle) : undefined,
+    });
+  if (ffmiV != null)
+    rows.push({
+      label: "FFMI",
+      value: fmt(ffmiV),
+      note: `Fettfri massa per längd – följer muskeltillväxt bättre än BMI. Tränad ${sex === "female" ? "kvinna ca 15–17, mycket muskulös 18+" : "man ca 18–20, mycket muskulös 22+"}.`,
+    });
+  if (whtr != null)
+    rows.push({ label: "Midja/längd", value: fmt(whtr, 2), note: whtr < 0.5 ? "Under 0,5 – inom det rekommenderade." : "0,5 eller mer – över den vanliga hälsogränsen 0,5." });
+  if (whr != null)
+    rows.push({
+      label: "Midja/höft",
+      value: fmt(whr, 2),
+      note: `WHO:s gräns för ökad risk är ${sex === "female" ? "0,85" : "0,90"}${sex ? "" : " (män; 0,85 för kvinnor)"} – du ligger ${whr < whrLimit ? "under" : "på eller över"}.`,
+    });
+  if (bmiV != null)
+    rows.push({ label: "BMI", value: fmt(bmiV), note: "Skiljer inte på muskler och fett – säger lite för den som styrketränar. Titta hellre på FFMI och midjan." });
+
+  const missing = [!heightCm && "längd", !sex && "kön"].filter(Boolean).join(" och ");
+  if (rows.length === 0 && !missing) return null;
+
+  return (
+    <div className="mt-2 rounded-[14px] border border-line bg-card-2 p-3">
+      <div className="text-[12px] font-medium text-ink-2">Beräknat</div>
+      <div className="mt-1 divide-y divide-line">
+        {rows.map((r) => (
+          <div key={r.label} className="py-2">
+            <div className="flex items-center justify-between gap-2 text-[13px]">
+              <span>{r.label}</span>
+              <span className="flex items-center gap-2">
+                <span className="tabular font-semibold">{r.value}</span>
+                {r.use && (
+                  <button onClick={r.use} className="rounded-full border border-line px-2 py-0.5 text-[11px] font-medium text-accent">
+                    Använd
+                  </button>
+                )}
+              </span>
+            </div>
+            <p className="mt-0.5 text-[11px] text-muted">{r.note}</p>
+          </div>
+        ))}
+      </div>
+      {missing && <p className="mt-1 text-[11px] text-muted">Ange {missing} under Inställningar för fler beräkningar.</p>}
+    </div>
+  );
+}
+
 function LogSheet({ open, onClose, list }: { open: boolean; onClose: () => void; list: BodyMeasurementRec[] }) {
   const store = useStore();
   const t = today();
@@ -708,6 +790,7 @@ function LogSheet({ open, onClose, list }: { open: boolean; onClose: () => void;
     Object.fromEntries((Object.keys(FIELDS) as Field[]).map((f) => [f, last(f)])) as Record<Field, number | null>,
   );
   const [busy, setBusy] = useState(false);
+  const [help, setHelp] = useState<Field | null>(null);
 
   const save = async () => {
     setBusy(true);
@@ -719,21 +802,41 @@ function LogSheet({ open, onClose, list }: { open: boolean; onClose: () => void;
     }
   };
 
-  const row = (f: Field) =>
-    values[f] == null ? (
-      <button key={f} onClick={() => setValues({ ...values, [f]: defaults[f] })} className="flex h-12 w-full items-center justify-between rounded-[14px] border border-dashed border-line px-4 text-[13px] text-ink-2">
-        {FIELDS[f].label} <Plus size={15} />
-      </button>
-    ) : (
-      <div key={f} className="flex items-center gap-2">
-        <div className="flex-1">
-          <Stepper label={FIELDS[f].label} value={values[f]!} onChange={(v) => setValues({ ...values, [f]: v })} step={FIELDS[f].step} unit={FIELDS[f].unit} />
+  const helpButton = (f: Field) => (
+    <button
+      aria-label={`Så mäter du ${FIELDS[f].label.toLowerCase()}`}
+      aria-expanded={help === f}
+      onClick={() => setHelp(help === f ? null : f)}
+      className={cn("flex size-9 shrink-0 items-center justify-center rounded-full", help === f ? "text-accent" : "text-muted")}
+    >
+      <Info size={16} />
+    </button>
+  );
+
+  const row = (f: Field) => (
+    <div key={f}>
+      {values[f] == null ? (
+        <div className="flex items-center gap-1">
+          <button onClick={() => setValues({ ...values, [f]: defaults[f] })} className="flex h-12 flex-1 items-center justify-between rounded-[14px] border border-dashed border-line px-4 text-[13px] text-ink-2">
+            {FIELDS[f].label} <Plus size={15} />
+          </button>
+          {helpButton(f)}
+          <span className="size-9 shrink-0" />
         </div>
-        <button aria-label={`Ta bort ${FIELDS[f].label}`} onClick={() => setValues({ ...values, [f]: null })} className="flex size-9 items-center justify-center rounded-full text-muted">
-          <Trash2 size={15} />
-        </button>
-      </div>
-    );
+      ) : (
+        <div className="flex items-center gap-1">
+          <div className="flex-1">
+            <Stepper label={FIELDS[f].label} value={values[f]!} onChange={(v) => setValues({ ...values, [f]: v })} step={FIELDS[f].step} unit={FIELDS[f].unit} />
+          </div>
+          {helpButton(f)}
+          <button aria-label={`Ta bort ${FIELDS[f].label}`} onClick={() => setValues({ ...values, [f]: null })} className="flex size-9 shrink-0 items-center justify-center rounded-full text-muted">
+            <Trash2 size={15} />
+          </button>
+        </div>
+      )}
+      {help === f && <p className="mt-1.5 rounded-[12px] bg-card-2 px-3 py-2 text-[12px] leading-relaxed text-ink-2">{FIELDS[f].how}</p>}
+    </div>
+  );
 
   return (
     <Sheet open={open} onClose={onClose} title={todays ? "Uppdatera dagens mätning" : "Ny mätning"}>
@@ -741,6 +844,8 @@ function LogSheet({ open, onClose, list }: { open: boolean; onClose: () => void;
         {(["weightKg", "bodyFatPct", "muscleMassKg"] as Field[]).map(row)}
         <div className="pt-2 text-[12px] font-medium text-ink-2">Mått</div>
         {(["waistCm", "chestCm", "armCm", "thighCm", "hipsCm"] as Field[]).map(row)}
+        <p className="px-1 text-[11px] text-muted">Mät samma tid på dagen, helst morgon, och på samma sida av kroppen varje gång.</p>
+        <Derived values={values} onUse={(f, v) => setValues({ ...values, [f]: v })} />
         <Button size="lg" className="mt-3 w-full" disabled={busy || Object.values(values).every((v) => v == null)} onClick={save}>
           Spara mätning
         </Button>
