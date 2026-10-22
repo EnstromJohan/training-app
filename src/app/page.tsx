@@ -6,6 +6,7 @@ import { ArrowRight, Clock, Dumbbell, Footprints, HeartPulse } from "lucide-reac
 import { HeroArt } from "@/components/hero-art";
 import { IMAGES, Photo } from "@/components/photo";
 import { ReadinessSheet } from "@/components/readiness-sheet";
+import { DayPartsCard } from "@/components/day-parts-card";
 import { CountUp } from "@/components/motion/count-up";
 import { SwipeToConfirm } from "@/components/motion/swipe-to-confirm";
 import { WeekBars } from "@/components/motion/week-bars";
@@ -17,6 +18,7 @@ import {
   deloadRecommendation,
   inProgressSession,
   pendingMorningCheck,
+  todayParts,
   weekCounts,
   weekPlan,
 } from "@/lib/coach";
@@ -49,6 +51,10 @@ export default function Dashboard() {
   const todayDay = todayPlan?.programDayId && todayPlan.status === "planned" ? PROGRAM_BY_ID[todayPlan.programDayId] : null;
   const nextDay = active ? PROGRAM_BY_ID[active.programDayId] : (todayDay ?? (plan.next ? PROGRAM_BY_ID[plan.next.programDayId] : null));
   const nextIsToday = !!active || !!todayDay;
+  const parts = todayParts(s, t);
+  const partsLeft = [parts.strength, parts.cardio, parts.rehab].some((x) => x && !x.done);
+  // Days with cardio or strength get the split card until every part is done.
+  const showParts = !active && (!!parts.strength || !!parts.cardio) && partsLeft;
   const counts = weekCounts(s, t);
   const volume = dailyVolumeThisWeek(s, t);
   const [volDay, setVolDay] = useState<string | null>(null);
@@ -111,8 +117,10 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Next session */}
-        {nextDay ? (
+        {/* Today's parts, or the next session */}
+        {showParts ? (
+          <DayPartsCard parts={parts} onStartStrength={() => setSheet(true)} />
+        ) : nextDay ? (
           <div className="surface rounded-[20px] p-4">
             <div className="flex items-center gap-3">
               <div className="h-[72px] w-[60px] shrink-0 overflow-hidden rounded-[12px] border border-line bg-[#111]">

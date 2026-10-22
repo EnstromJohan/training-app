@@ -605,3 +605,31 @@ export function groupVolume(s: Snapshot, today: string, weeks: number) {
     };
   });
 }
+
+// ---------- Today's parts ----------
+
+export interface TodayParts {
+  /** Today's strength day (planned, in progress or completed). */
+  strength: { day: ProgramDay; done: boolean; active: boolean } | null;
+  /** The cardio slot that belongs to today's strength day, if it is still open this week. */
+  cardio: { slot: CardioSlot; done: boolean } | null;
+  /** Achilles rehab is done every day. */
+  rehab: { done: boolean };
+}
+
+/** Strength, cardio and rehab for today as separate parts, so they can be split over the day. */
+export function todayParts(s: Snapshot, today: string): TodayParts {
+  const plan = weekPlan(s, today);
+  const active = inProgressSession(s);
+  const planned = plan.days.find((d) => d.date === today && d.programDayId);
+  const dayId = active?.date === today ? active.programDayId : planned?.programDayId;
+  const day = dayId ? PROGRAM_BY_ID[dayId] : null;
+  const strength =
+    day && day.category !== "rest" ? { day, done: !active && planned?.status === "completed", active: active?.programDayId === day.id } : null;
+
+  const cardioToday = alive(s.cardio).some((c) => c.date === today);
+  const slot = day?.cardioSlot;
+  const cardio = slot && (cardioToday || cardioWeek(s, today).pending.includes(slot)) ? { slot, done: cardioToday } : null;
+
+  return { strength, cardio, rehab: { done: alive(s.rehab).some((r) => r.date === today) } };
+}

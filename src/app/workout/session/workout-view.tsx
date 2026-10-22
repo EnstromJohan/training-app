@@ -20,6 +20,7 @@ import type { Exercise } from "@/lib/engine/types";
 import type { SessionExerciseRec, SetLogRec } from "@/lib/db/records";
 import { EXERCISES } from "@/lib/program/exercises";
 import { PROGRAM_BY_ID } from "@/lib/program/program";
+import { isPicked } from "@/lib/day-parts";
 import { useStore, today } from "@/lib/store";
 import { haptic, useWakeLock } from "@/lib/use-wake-lock";
 
@@ -217,6 +218,8 @@ function ActiveWorkout({ sessionId }: { sessionId: string }) {
   const prev = p.lastExposure;
   const increasing = p.reason.code.startsWith("increase");
   const rehab = rehabPlan(s);
+  // Hidden when rehab is already logged today or was left for another part of the day.
+  const rehabNow = !s.rehab.some((r) => r.date === today() && !r.deletedAt) && isPicked(today(), "rehab");
   const rirLabel = (min: number, max: number) => (min === max ? `${min}` : `${min}–${max}`);
 
   return (
@@ -509,18 +512,20 @@ function ActiveWorkout({ sessionId }: { sessionId: string }) {
       </div>
 
       {/* Rehab between sets */}
-      <button onClick={() => setSheet("rehab")} className="surface mt-3 flex w-full items-center gap-3 rounded-[16px] p-3 text-left">
-        <span className="flex size-10 items-center justify-center rounded-full border border-line bg-card-2 text-accent">
-          <Footprints size={18} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="text-[14px] font-semibold">Hälsene-rehab</div>
-          <div className="truncate text-[12px] text-muted">
-            {timer ? "Kör under vilan" : "Mellan seten"} · {rehab.exercises.map((e) => e.name).join(", ")}
+      {rehabNow && (
+        <button onClick={() => setSheet("rehab")} className="surface mt-3 flex w-full items-center gap-3 rounded-[16px] p-3 text-left">
+          <span className="flex size-10 items-center justify-center rounded-full border border-line bg-card-2 text-accent">
+            <Footprints size={18} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="text-[14px] font-semibold">Hälsene-rehab</div>
+            <div className="truncate text-[12px] text-muted">
+              {timer ? "Kör under vilan" : "Mellan seten"} · {rehab.exercises.map((e) => e.name).join(", ")}
+            </div>
           </div>
-        </div>
-        <ChevronRight size={18} className="text-muted" />
-      </button>
+          <ChevronRight size={18} className="text-muted" />
+        </button>
+      )}
 
       {prev && (
         <p className="mt-3 px-1 text-[12px] text-muted">
@@ -551,19 +556,21 @@ function ActiveWorkout({ sessionId }: { sessionId: string }) {
           )
         }
         extra={
-          <button
-            onClick={() => {
-              closeRest();
-              setSheet("rehab");
-            }}
-            className="surface flex w-full items-center gap-3 rounded-[16px] p-3 text-left"
-          >
-            <Footprints size={18} className="shrink-0 text-accent" />
-            <span className="min-w-0 flex-1 truncate text-[13px]">
-              <b>Hälsene-rehab under vilan</b> <span className="text-muted">· {rehab.exercises.map((e) => e.name).join(", ")}</span>
-            </span>
-            <ChevronRight size={16} className="text-muted" />
-          </button>
+          rehabNow && (
+            <button
+              onClick={() => {
+                closeRest();
+                setSheet("rehab");
+              }}
+              className="surface flex w-full items-center gap-3 rounded-[16px] p-3 text-left"
+            >
+              <Footprints size={18} className="shrink-0 text-accent" />
+              <span className="min-w-0 flex-1 truncate text-[13px]">
+                <b>Hälsene-rehab under vilan</b> <span className="text-muted">· {rehab.exercises.map((e) => e.name).join(", ")}</span>
+              </span>
+              <ChevronRight size={16} className="text-muted" />
+            </button>
+          )
         }
       />
 
@@ -669,6 +676,7 @@ function ActiveWorkout({ sessionId }: { sessionId: string }) {
           setTimer(null);
           setSheet(null);
         }}
+        rehab={rehabNow}
         doneSets={items.reduce((a, se) => a + working(se).length, 0)}
         plannedSets={items.reduce((a, se) => a + se.prescription.sets.length, 0)}
       />
@@ -805,11 +813,13 @@ function FinishSheet({
   open,
   onClose,
   onFinish,
+  rehab,
   doneSets,
   plannedSets,
 }: {
   open: boolean;
   onClose: () => void;
+  rehab: boolean;
   onFinish: (rpe: number, pain: number | null) => void;
   doneSets: number;
   plannedSets: number;
@@ -828,19 +838,21 @@ function FinishSheet({
           <div className="mb-2 text-sm font-medium">Hur tungt var passet totalt? (RPE)</div>
           <Scale value={rpe} onChange={setRpe} min={1} max={10} labels={["Lätt", "Max"]} />
         </div>
-        <div>
-          <label className="mb-2 flex items-center gap-2 text-sm font-medium">
-            <input type="checkbox" checked={rehabDone} onChange={(e) => setRehabDone(e.target.checked)} className="size-4 accent-[#ff8a3d]" />
-            Jag gjorde hälsene-rehaben
-          </label>
-          {rehabDone && (
-            <>
-              <div className="mb-2 text-xs text-muted">Högsta smärta i hälsenan under rehaben (0–10)</div>
-              <Scale value={pain} onChange={setPain} labels={["Ingen", "Värsta"]} />
-            </>
-          )}
-        </div>
-        <Button size="lg" className="w-full" disabled={rpe == null || (rehabDone && pain == null)} onClick={() => onFinish(rpe!, rehabDone ? pain : null)}>
+        {rehab && (
+          <div>
+            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+              <input type="checkbox" checked={rehabDone} onChange={(e) => setRehabDone(e.target.checked)} className="size-4 accent-[#ff8a3d]" />
+              Jag gjorde hälsene-rehaben
+            </label>
+            {rehabDone && (
+              <>
+                <div className="mb-2 text-xs text-muted">Högsta smärta i hälsenan under rehaben (0–10)</div>
+                <Scale value={pain} onChange={setPain} labels={["Ingen", "Värsta"]} />
+              </>
+            )}
+          </div>
+        )}
+        <Button size="lg" className="w-full" disabled={rpe == null || (rehab && rehabDone && pain == null)} onClick={() => onFinish(rpe!, rehab && rehabDone ? pain : null)}>
           Spara pass
         </Button>
       </div>
@@ -856,7 +868,7 @@ function Summary({ sessionId }: { sessionId: string }) {
   const { items, setsBySe } = useSessionData(sessionId);
   const cardio = cardioWeek(s, today());
   const slot = day.cardioSlot;
-  const cardioPending = slot && cardio.pending.includes(slot) && session.date === today();
+  const cardioPending = slot && cardio.pending.includes(slot) && session.date === today() && isPicked(session.date, "cardio");
 
   const rows = items.map((se) => {
     const sets = (setsBySe.get(se.id) ?? []).filter((x) => x.kind === "working");

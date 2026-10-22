@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { cardioProjection, exposuresByExercise, prescribeDay, weekPlan, type Snapshot } from "../coach";
+import { cardioProjection, exposuresByExercise, prescribeDay, todayParts, weekPlan, type Snapshot } from "../coach";
 import { fromRow, toRow, upsertTolerant } from "../db/supabase";
 import { SETTINGS_ID, type SettingsRec, type SetLogRec } from "../db/records";
 import { DEFAULT_EQUIPMENT } from "../engine/types";
@@ -179,5 +179,43 @@ describe("sync against an older schema", () => {
     const res = await upsertTolerant(sb as never, "settings", [{ id: "1" }], new Set());
     expect(res.error?.code).toBe("42501");
     expect(res.dropped).toBe(false);
+  });
+});
+
+describe("today's parts", () => {
+  const MON = "2026-10-19";
+  const TUE = "2026-10-20";
+
+  it("splits a strength day with cardio into strength, cardio and rehab", () => {
+    const parts = todayParts(empty(), MON);
+    expect(parts.strength?.day.id).toBe("cb-a");
+    expect(parts.strength?.done).toBe(false);
+    expect(parts.cardio).toEqual({ slot: "A", done: false });
+    expect(parts.rehab.done).toBe(false);
+  });
+
+  it("has no cardio part on a strength-only day", () => {
+    const s = empty();
+    addSession(s, "mon", MON, `${MON}T18:00:00Z`, "bench-press", 80, [8, 8, 8]);
+    const parts = todayParts(s, TUE);
+    expect(parts.strength?.day.id).toBe("legs-a");
+    expect(parts.cardio).toBeNull();
+  });
+
+  it("moves the cardio part with a strength day the planner shifted", () => {
+    // Monday was missed, so Bröst + Rygg A (with cardio A) moves to Tuesday.
+    const parts = todayParts(empty(), TUE);
+    expect(parts.strength?.day.id).toBe("cb-a");
+    expect(parts.cardio?.slot).toBe("A");
+  });
+
+  it("marks cardio and rehab done once logged today (e.g. in the morning)", () => {
+    const s = empty();
+    s.cardio.push({ id: "c1", createdAt: T, updatedAt: T, date: MON, slot: "A", kind: "z2", modality: "bike", durationMin: 30, completed: true, rpe: 4 } as never);
+    s.rehab.push({ id: "r1", createdAt: T, updatedAt: T, date: MON, phase: 2, level: 1, completed: true, painDuring: 2, painNextMorning: null } as never);
+    const parts = todayParts(s, MON);
+    expect(parts.cardio).toEqual({ slot: "A", done: true });
+    expect(parts.rehab.done).toBe(true);
+    expect(parts.strength?.done).toBe(false);
   });
 });

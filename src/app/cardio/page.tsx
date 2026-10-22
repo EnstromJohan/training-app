@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, ChevronLeft, ChevronUp, Heart, Lock, LockOpen, Music, Pause, Play, RotateCcw } from "lucide-react";
 import { HeroArt } from "@/components/hero-art";
@@ -10,6 +11,7 @@ import { cardioPrescriptionFor, cardioProjection, cardioWeek, insights, weeklySt
 import { allowedModalities, hrZones, INTENSITY_UNIT, MODALITY_LABEL } from "@/lib/engine/cardio/zones";
 import { isoWeek } from "@/lib/engine/weekly/dates";
 import type { CardioModality, CardioPrescription, CardioSlot } from "@/lib/engine/types";
+import { pickedParts } from "@/lib/day-parts";
 import { useStore, today } from "@/lib/store";
 import { useWakeLock } from "@/lib/use-wake-lock";
 
@@ -90,6 +92,9 @@ export default function CardioPage() {
   const stats = weeklyStats(s, t, 5);
   const maxMin = Math.max(1, ...stats.map((w) => w.cardioMin));
   const trend = insights(s, t, "month").cardio.pct;
+  // Rehab was picked for this part of the day on the dashboard and is next after cardio.
+  const rehabNext =
+    s.cardio.some((c) => c.date === t && !c.deletedAt) && !!pickedParts(t)?.includes("rehab") && !s.rehab.some((r) => r.date === t && !r.deletedAt);
 
   return (
     <div>
@@ -115,6 +120,12 @@ export default function CardioPage() {
           ))}
         </div>
       </section>
+
+      {rehabNext && (
+        <Link href="/rehab" className="bg-accent-grad glow mt-3 flex h-[52px] items-center justify-center rounded-full text-[16px] font-semibold text-on-accent">
+          Fortsätt till hälsene-rehab →
+        </Link>
+      )}
 
       {/* Session card */}
       <div className="surface mt-3 rounded-[20px] p-4">
